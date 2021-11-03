@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Beyond message board</title>
+    <title>Student Job Board</title>
     <style type="text/css">
       .author,
       .eom {
@@ -10,20 +10,6 @@
   </head>
 
   <body>
-    <h1>Beyond message board</h1>
-    <div class="newfrm">
-      <p class="newmsg">New message:</p>
-      <form method="POST">
-        {% csrf_token %} {{ form.as_p }}
-        <input type="submit" value="Post" />
-      </form>
-    </div>
-    {% for message in messages %}
-    <div class="message">
-      <p class="author">Posted by {{message.author}} at {{message.date}}</p>
-      <p>{{ message.text }}</p>
-    </div>
-    {% endfor %}
-    <p class="EOM">(End of messages)</p>
+    <h1>Student Job Board</h1>
   </body>
 </html>
