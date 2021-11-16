@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'jobboard.apps.JobboardConfig',
     'Login.apps.LoginConfig',
+    'student.apps.StudentConfig',
+    'recruiter.apps.RecruiterConfig'
 ]
 
 MIDDLEWARE = [
