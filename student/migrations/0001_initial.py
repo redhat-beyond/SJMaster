@@ -5,7 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -23,14 +22,17 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Student',
             fields=[
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, serialize=False, to='auth.user')),
+                ('user',
+                 models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, serialize=False,
+                                      to='auth.user')),
                 ('first_name', models.CharField(max_length=255)),
                 ('last_name', models.CharField(max_length=255)),
                 ('email', models.EmailField(max_length=255)),
                 ('date_of_birth', models.DateField()),
                 ('phone_number', models.CharField(blank=True, max_length=15)),
                 ('graduation_date', models.DateField()),
-                ('educational_institution_name', models.ManyToManyField(related_name='students', to='student.EducationalInstitution')),
+                ('educational_institution_name',
+                 models.ManyToManyField(related_name='students', to='student.EducationalInstitution')),
             ],
         ),
     ]
