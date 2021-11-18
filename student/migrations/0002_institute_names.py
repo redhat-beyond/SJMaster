@@ -55,7 +55,7 @@ class Migration(migrations.Migration):
         ]
         with transaction.atomic():
             for name in institution_names:
-                EducationalInstitution(institution_name=name).save()
+                EducationalInstitution(name=name).save()
 
     operations = [
         migrations.RunPython(generate_data),
