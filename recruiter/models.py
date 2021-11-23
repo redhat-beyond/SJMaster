@@ -10,6 +10,21 @@ class Company(models.Model):
     def __str__(self):
         return self.name
 
+    def get_all_recruiters_of_a_specified_company(self):
+        """
+        returns all recruiters of a specified company
+        Input: a company instance
+        Output: all recruiters of the company
+        """
+        return self.recruiters.all()
+
+    @classmethod
+    def get_all_companies(cls):
+        """
+        returns all existing companies in the website
+        """
+        return cls.objects.order_by("name")
+
 
 class Recruiter(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, primary_key=True)
