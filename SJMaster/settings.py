@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'student.apps.StudentConfig',
     'recruiter.apps.RecruiterConfig',
     'login.apps.LoginConfig',
+    'application.apps.ApplicationConfig',
 ]
 
 MIDDLEWARE = [
