@@ -50,7 +50,7 @@ class Migration(migrations.Migration):
             example_company_b.save()
 
             # adding example jobs to db
-            job_a = Job(title="job_a", company=example_company_a, job_type="Full-Time", work_from="Office_Only",
+            job_a = Job(title="job_a", company=example_company_a, job_type="Full-Time", work_from="Office-Only",
                         description="This is job a", city=City.objects.get(name="Tel Aviv-Yafo"), address="Rotchild 12",
                         date_created=datetime.date(2021, 6, 8))
             job_a.save()

@@ -4,10 +4,8 @@ from .models import (
     City,
     JobTitleKeyword,
     Job,
-    Application,
 )
 admin.site.register(Region)
 admin.site.register(City)
 admin.site.register(JobTitleKeyword)
 admin.site.register(Job)
-admin.site.register(Application)

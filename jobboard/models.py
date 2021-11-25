@@ -1,6 +1,6 @@
 from django.db import models
 from recruiter.models import Company
-from student.models import Student
+import datetime
 
 
 class Region(models.Model):
@@ -31,8 +31,8 @@ class Job(models.Model):
     job_type = models.CharField(max_length=255, choices=[("Full-Time", "Full-Time"),
                                                          ("Part-Time", "Part-Time"),
                                                          ("Internship", "Internship")])
-    work_from = models.CharField(max_length=255, choices=[("Office_Only", "Office_Only"),
-                                                          ("Remote_Only", "Remote_Only"),
+    work_from = models.CharField(max_length=255, choices=[("Office-Only", "Office-Only"),
+                                                          ("Remote-Only", "Remote-Only"),
                                                           ("Hybrid", "Hybrid")], default="Office_Only")
     description = models.TextField()
     city = models.ForeignKey(City, on_delete=models.CASCADE)
@@ -40,14 +40,62 @@ class Job(models.Model):
     date_created = models.DateField()
     title_keywords = models.ManyToManyField(JobTitleKeyword)
 
+    @classmethod
+    def get_jobs_by_city_name(cls, city_name):
+        """
+        Allows students to search for a job based on the city it is located in
+        """
+        return set(cls.objects.filter(city=City.objects.get(name=city_name)))
+
+    @classmethod
+    def get_jobs_by_region_name(cls, region_name):
+        """
+        Allows students to search for a job based on the region it is located in
+        """
+        jobs_to_return = set()
+        region = Region.objects.get(name=region_name)
+        for city in City.objects.filter(region=region):
+            jobs_to_return.update(cls.get_jobs_by_city_name(city.name))
+        return jobs_to_return
+
+    @classmethod
+    def get_jobs_by_job_type(cls, job_type):
+        """
+        Allows students to search for a job based on the job-type (full-time, internship or part-time)
+        """
+        return set(cls.objects.filter(job_type=job_type))
+
+    @classmethod
+    def get_jobs_by_keywords(cls, *keywords_as_string):
+        """
+        Allows students to search for a job based on one ore more keywords linked to the job
+        """
+        jobs_to_return = set()
+        for keyword in keywords_as_string:
+            keyword_object = JobTitleKeyword.objects.get(keyword=keyword)
+            jobs_to_return.update(set(cls.objects.filter(title_keywords=keyword_object)))
+        return jobs_to_return
+
+    @classmethod
+    def get_jobs_posted_on_or_after_specific_date(cls, date):
+        """
+        Allows students to search for a job that was posted on or after a specific date
+        """
+        return set(cls.objects.filter(date_created__range=[date, datetime.date.today()]))
+
+    @classmethod
+    def get_jobs_by_work_model(cls, work_model):
+        """
+        Allows students to search for a job based on the work model (Office-Only, Remote-Only or Hybrid)
+        """
+        return set(cls.objects.filter(work_from=work_model))
+
+    @classmethod
+    def get_jobs_by_company_name(cls, company_name):
+        """
+        Allows students to search for a job based on the company
+        """
+        return set(cls.objects.filter(company=Company.objects.get(name=company_name)))
+
     def __str__(self):
         return f"{self.title}, {self.company.name}"
-
-
-class Application(models.Model):
-    job = models.ForeignKey(Job, on_delete=models.CASCADE)
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    date_applied = models.DateField()
-
-    def __str__(self):
-        return f"{self.student.name} applied to {self.job}"
