@@ -1,3 +1,13 @@
-# from django.contrib import admin
-
-# Register your models here.
+from django.contrib import admin
+from .models import (
+    Region,
+    City,
+    JobTitleKeyword,
+    Job,
+    Application,
+)
+admin.site.register(Region)
+admin.site.register(City)
+admin.site.register(JobTitleKeyword)
+admin.site.register(Job)
+admin.site.register(Application)
