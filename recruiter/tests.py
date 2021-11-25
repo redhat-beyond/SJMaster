@@ -1,7 +1,6 @@
 import pytest
 from django.contrib.auth.models import User
 from django.db.models import QuerySet
-
 from recruiter.models import Company, Recruiter
 
 
@@ -28,12 +27,13 @@ def example_recruiter(example_company, example_user):
 
 
 @pytest.mark.django_db
-def test_get_all_companies_returns_all_companies_as_a_query_set(example_company):
+def test_get_all_companies_returns_all_companies_as_a_query_set():
     companies_set = Company.get_all_companies()
     assert isinstance(companies_set, QuerySet)
     assert all(isinstance(company, Company) for company in companies_set)
     assert list(companies_set.values_list("name", "description", "website_url")) == [
-        (example_company.name, example_company.description, example_company.website_url)]
+        ("example_company_a", "This is company a", "company_a.com"),
+        ("example_company_b", "This is company b", "company_b.com")]
 
 
 @pytest.mark.django_db
