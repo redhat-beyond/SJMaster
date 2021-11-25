@@ -52,12 +52,12 @@ class Migration(migrations.Migration):
             # adding example jobs to db
             job_a = Job(title="job_a", company=example_company_a, job_type="Full-Time", work_from="Office_Only",
                         description="This is job a", city=City.objects.get(name="Tel Aviv-Yafo"), address="Rotchild 12",
-                        date_created=datetime.datetime(2021, 6, 8))
+                        date_created=datetime.date(2021, 6, 8))
             job_a.save()
 
             job_b = Job(title="job_b", company=example_company_b, job_type="Part-Time", work_from="Hybrid",
                         description="This is job a", city=City.objects.get(name="Beersheba"), address="Herzel 2",
-                        date_created=datetime.datetime(2021, 11, 20))
+                        date_created=datetime.date(2021, 11, 20))
             job_b.save()
 
             title_keyword_a = JobTitleKeyword.objects.get(keyword="software")
