@@ -55,7 +55,7 @@ def test_get_institutions_with_enrolled_students_returns_institutions_with_enrol
 @pytest.mark.django_db
 def test_get_students_enrolled_at_given_institutions_returns_students_enrolled_at_the_given_institutions_as_a_query_set(
         example_institution_a, example_institution_b, example_student_a, example_student_b):
-    students_query_set = Student.get_students_enrolled_at([example_institution_a])
+    students_query_set = Student.get_students_enrolled_at_specified_institutions([example_institution_a])
     assert isinstance(students_query_set, QuerySet)
     assert all(isinstance(student, Student) for student in students_query_set)
     assert list(
@@ -71,7 +71,7 @@ def test_get_students_enrolled_at_given_institutions_returns_students_enrolled_a
 @pytest.mark.django_db
 def test_get_students_graduate_after_returns_students_that_graduate_after_the_given_year_as_query_set(
         example_student_a, example_student_b):
-    students_grad_after_2023_query_set = Student.get_students_graduate_after(2023)
+    students_grad_after_2023_query_set = Student.get_students_that_graduate_after_specified_year(2023)
     assert isinstance(students_grad_after_2023_query_set, QuerySet)
     assert all(isinstance(student, Student) for student in students_grad_after_2023_query_set)
     assert list(

@@ -11,7 +11,7 @@ class EducationalInstitution(models.Model):
     @classmethod
     def get_institutions_with_enrolled_students(cls):
         """
-        Return all institutions that have enrolled students as a QuerySet
+        For recruiters to use, so they can know which institutions are relevant to choose students from.
         """
         return cls.objects.filter(students__isnull=False)
 
@@ -30,15 +30,15 @@ class Student(models.Model):
         return f'{self.full_name}'
 
     @classmethod
-    def get_students_enrolled_at(cls, institutions):
+    def get_students_enrolled_at_specified_institutions(cls, institutions):
         """
-        Gets all the students that are enrolled at one of the given institutions
+        For recruiters to use when they want to only view students from specific institutions.
         """
         return cls.objects.filter(educational_institution__in=institutions)
 
     @classmethod
-    def get_students_graduate_after(cls, year):
+    def get_students_that_graduate_after_specified_year(cls, year):
         """
-        Gets all the students from the DB that graduate after a given year
+        For recruiters to use when they want to view students according to their graduation year.
         """
         return cls.objects.filter(graduation_date__year__gte=year)
