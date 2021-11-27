@@ -50,20 +50,43 @@ class Migration(migrations.Migration):
             example_company_b.save()
 
             # adding example jobs to db
-            job_a = Job(title="job_a", company=example_company_a, job_type="Full-Time", work_from="Office_Only",
+            job_a = Job(title="job_a", company=example_company_a, job_type="Full-Time", work_from="Office-Only",
                         description="This is job a", city=City.objects.get(name="Tel Aviv-Yafo"), address="Rotchild 12",
-                        date_created=datetime.datetime(2021, 6, 8))
+                        date_created=datetime.date(2021, 6, 8))
             job_a.save()
 
             job_b = Job(title="job_b", company=example_company_b, job_type="Part-Time", work_from="Hybrid",
                         description="This is job a", city=City.objects.get(name="Beersheba"), address="Herzel 2",
-                        date_created=datetime.datetime(2021, 11, 20))
+                        date_created=datetime.date(2021, 11, 20))
             job_b.save()
 
-            title_keyword_a = JobTitleKeyword.objects.get(keyword="software")
-            title_keyword_b = JobTitleKeyword.objects.get(keyword="engineer")
-            job_a.title_keywords.add(title_keyword_a, title_keyword_b)
-            job_b.title_keywords.add(title_keyword_a)
+            job_c = Job(title="job_c", company=example_company_a, job_type="Part-Time",
+                        work_from="Hybrid",
+                        description="This is job c", city=City.objects.get(name="Tel Aviv-Yafo"), address="Rotchild 12",
+                        date_created=datetime.date(2021, 7, 22))
+            job_c.save()
+
+            job_d = Job(title="job_d", company=example_company_b, job_type="Internship",
+                        work_from="Remote-Only", description="This is job d", city=City.objects.get(name="Herziliyya"),
+                        address="Herzel 2", date_created=datetime.date(2021, 10, 29))
+            job_d.save()
+
+            job_e = Job(title="job_e", company=example_company_a, job_type="Part-Time",
+                        work_from="Office_Only", description="This is job e",
+                        city=City.objects.get(name="Beersheba"), address="Street 3",
+                        date_created=datetime.date(2021, 3, 1))
+            job_e.save()
+
+            software_keyword = JobTitleKeyword.objects.get(keyword="software")
+            engineer_keyword = JobTitleKeyword.objects.get(keyword="engineer")
+            product_keyword = JobTitleKeyword.objects.get(keyword="product")
+            automation_keyword = JobTitleKeyword.objects.get(keyword="automation")
+
+            job_a.title_keywords.add(software_keyword, engineer_keyword)
+            job_b.title_keywords.add(software_keyword)
+            job_c.title_keywords.add(product_keyword)
+            job_d.title_keywords.add(product_keyword)
+            job_e.title_keywords.add(software_keyword, automation_keyword)
 
     operations = [
         migrations.RunPython(generate_data),
