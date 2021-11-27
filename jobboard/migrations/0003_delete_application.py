@@ -4,6 +4,10 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
+<<<<<<< HEAD
+=======
+
+>>>>>>> 55d63ba (update the migrations file of jobboard)
     dependencies = [
         ('jobboard', '0002_add_example_data'),
     ]

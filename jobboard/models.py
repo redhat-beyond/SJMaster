@@ -1,6 +1,5 @@
 from django.db import models
 from recruiter.models import Company
-import datetime
 
 
 class Region(models.Model):
