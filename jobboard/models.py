@@ -1,5 +1,5 @@
 from django.db import models
-from recruiter.models import Company
+from recruiter.models import Company, Recruiter
 import datetime
 
 
@@ -28,11 +28,15 @@ class JobTitleKeyword(models.Model):
 class Job(models.Model):
     title = models.CharField(max_length=255)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    recruiter = models.ForeignKey(Recruiter, on_delete=models.PROTECT,
+                                  default=None)
     job_type = models.CharField(max_length=255, choices=[("Full-Time", "Full-Time"),
-                                                         ("Part-Time", "Part-Time"),
+                                                         ("Part-Time",
+                                                          "Part-Time"),
                                                          ("Internship", "Internship")])
     work_from = models.CharField(max_length=255, choices=[("Office-Only", "Office-Only"),
-                                                          ("Remote-Only", "Remote-Only"),
+                                                          ("Remote-Only",
+                                                           "Remote-Only"),
                                                           ("Hybrid", "Hybrid")], default="Office_Only")
     description = models.TextField()
     city = models.ForeignKey(City, on_delete=models.CASCADE)
@@ -73,7 +77,8 @@ class Job(models.Model):
         jobs_to_return = set()
         for keyword in keywords_as_string:
             keyword_object = JobTitleKeyword.objects.get(keyword=keyword)
-            jobs_to_return.update(set(cls.objects.filter(title_keywords=keyword_object)))
+            jobs_to_return.update(
+                set(cls.objects.filter(title_keywords=keyword_object)))
         return jobs_to_return
 
     @classmethod
