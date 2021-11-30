@@ -6,7 +6,7 @@ import datetime
 class Region(models.Model):
     name = models.CharField(max_length=255)
 
-    def _str_(self):
+    def __str__(self):
         return self.name
 
 
@@ -14,14 +14,14 @@ class City(models.Model):
     name = models.CharField(max_length=255)
     region = models.ForeignKey(Region, on_delete=models.CASCADE)
 
-    def _str_(self):
+    def __str__(self):
         return self.name
 
 
 class JobTitleKeyword(models.Model):
     keyword = models.CharField(max_length=255)
 
-    def _str_(self):
+    def __str__(self):
         return self.keyword
 
 
@@ -102,5 +102,12 @@ class Job(models.Model):
         """
         return set(cls.objects.filter(company=Company.objects.get(name=company_name)))
 
-    def _str_(self):
+    @classmethod
+    def get_jobs_by_recruiter_id(cls, recruiter: Recruiter):
+        """
+        Allows students to search for a job based on the company
+        """
+        return set(cls.objects.filter(recruiter__user_id=recruiter.user.id))
+
+    def __str__(self):
         return f"{self.title}, {self.company.name}"

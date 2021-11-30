@@ -33,8 +33,12 @@ def test_get_all_companies_returns_all_companies_as_a_query_set():
 @pytest.mark.django_db
 def test_get_all_recruiters_of_a_specified_company_returns_all_recruiters_as_a_query_set(example_recruiter):
     recruiter_set = Company.get_all_recruiters_of_a_specified_company(Company.objects.get(name="example_company_a"))
+    recruiter_a_already_in_db = Recruiter.objects.get(name='a')
     assert isinstance(recruiter_set, QuerySet)
     assert all(isinstance(recruiter, Recruiter) for recruiter in recruiter_set)
     assert list(recruiter_set.values_list("user", "name", "company", "email", "phone_number")) == [
+        (recruiter_a_already_in_db.user.id, recruiter_a_already_in_db.name, recruiter_a_already_in_db.company.id,
+         recruiter_a_already_in_db.email, recruiter_a_already_in_db.phone_number),
         (example_recruiter.user.id, example_recruiter.name, example_recruiter.company.id, example_recruiter.email,
-         example_recruiter.phone_number)]
+         example_recruiter.phone_number),
+    ]
