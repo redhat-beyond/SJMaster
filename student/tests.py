@@ -2,7 +2,7 @@ import pytest
 from django.contrib.auth.models import User
 from django.db.models import QuerySet
 
-from student.models import Student, EducationalInstitution
+from student.models import Student, EducationalInstitution, Major
 from datetime import date
 
 
@@ -25,8 +25,8 @@ def example_student_a(example_institution_a):
     example_user = User.objects.create_user("test", "testpassword")
     example_user.save()
     student = Student(user=example_user, full_name="test user", email="test@test.com", date_of_birth=date(2020, 7, 13),
-                      phone_number="0000000000", educational_institution=example_institution_a,
-                      graduation_date=date(2020, 7, 13))
+                      phone_number="0000000000", educational_institution=example_institution_a, major=Major.UNDECIDED,
+                      about="testing", graduation_date=date(2020, 7, 13))
     student.save()
     return student
 
@@ -38,6 +38,8 @@ def example_student_b(example_institution_b):
     student = Student(user=example_user, full_name="test user2", email="test2@test.com",
                       date_of_birth=date(2023, 7, 13),
                       phone_number="0000000000", educational_institution=example_institution_b,
+                      major=Major.COMPUTER_SCIENCE,
+                      about="testing",
                       graduation_date=date(2023, 7, 13))
     student.save()
     return student
