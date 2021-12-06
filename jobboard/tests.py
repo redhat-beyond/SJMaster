@@ -17,6 +17,16 @@ def test_get_jobs_by_company_name():
 
 
 @pytest.mark.django_db
+def test_get_jobs_by_recruiter_id():
+    job_a = Job.objects.get(title="job_a")
+    job_c = Job.objects.get(title="job_c")
+    jobs_by_recruiter_a_added_manually = {job_a, job_c}
+    jobs_by_recruiter_a_id_from_test_function = Job.get_jobs_by_recruiter_id(job_a.recruiter)
+    assert isinstance(jobs_by_recruiter_a_added_manually, set)
+    assert jobs_by_recruiter_a_id_from_test_function == jobs_by_recruiter_a_added_manually
+
+
+@pytest.mark.django_db
 def test_get_jobs_by_city_name():
     job_b = Job.objects.get(title="job_b")
     job_e = Job.objects.get(title="job_e")
