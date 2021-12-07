@@ -1,5 +1,6 @@
 import pytest
 from jobboard.models import Job
+from student.models import Major
 import datetime
 
 
@@ -93,3 +94,21 @@ def test_get_jobs_by_work_model():
     jobs_by_hybrid_work_model_added_manually = {job_b, job_c}
     jobs_by_hybrid_work_model_from_function = Job.get_jobs_by_work_model("Hybrid")
     assert jobs_by_hybrid_work_model_added_manually == jobs_by_hybrid_work_model_from_function
+
+
+@pytest.mark.django_db
+def test_get_jobs_by_major():
+    job_a = Job.objects.get(title="job_a")
+    job_b = Job.objects.get(title="job_b")
+    job_c = Job.objects.get(title="job_c")
+    job_d = Job.objects.get(title="job_d")
+    job_e = Job.objects.get(title="job_e")
+    jobs_by_communications_major_added_manually = {job_b, job_e}
+    jobs_by_communications_major_from_test_function = Job.get_jobs_by_major(Major.COMMUNICATIONS)
+    jobs_by_computer_science_and_law_major_added_manually = {job_a, job_c, job_d}
+    jobs_by_computer_science_and_law_major_from_test_function = Job.get_jobs_by_major(Major.COMPUTER_SCIENCE, Major.LAW)
+    # tests function by single major "Major.COMMUNICATIONS"
+    assert jobs_by_communications_major_from_test_function == jobs_by_communications_major_added_manually
+    # tests function by two majors "Major.COMPUTER_SCIENCE" and "Major.LAW"
+    assert jobs_by_computer_science_and_law_major_from_test_function == \
+           jobs_by_computer_science_and_law_major_added_manually

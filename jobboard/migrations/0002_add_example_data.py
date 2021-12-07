@@ -1,10 +1,12 @@
 from django.db import migrations, transaction
 import datetime
+from student.models import Major
 
 
 class Migration(migrations.Migration):
     dependencies = [
         ('jobboard', '0005_job_recruiter'),
+        ('jobboard', '0006_job_major'),
         ('recruiter', '0001_initial'),
     ]
 
@@ -74,31 +76,32 @@ class Migration(migrations.Migration):
             recruiter_b.save()
 
             # adding example jobs to db
-            job_a = Job(title="job_a", company=example_company_a, recruiter=recruiter_a, job_type="Full-Time",
-                        work_from="Office-Only",
+            job_a = Job(title="job_a", company=example_company_a, recruiter=recruiter_a, major=Major.COMPUTER_SCIENCE,
+                        job_type="Full-Time", work_from="Office-Only",
                         description="This is job a", city=City.objects.get(name="Tel Aviv-Yafo"), address="Rotchild 12",
                         date_created=datetime.date(2021, 6, 8))
             job_a.save()
 
-            job_b = Job(title="job_b", company=example_company_b, recruiter=recruiter_b, job_type="Part-Time",
-                        work_from="Hybrid",
+            job_b = Job(title="job_b", company=example_company_b, recruiter=recruiter_b, major=Major.COMMUNICATIONS,
+                        job_type="Part-Time", work_from="Hybrid",
                         description="This is job a", city=City.objects.get(name="Beersheba"), address="Herzel 2",
                         date_created=datetime.date(2021, 11, 20))
             job_b.save()
 
-            job_c = Job(title="job_c", company=example_company_a, recruiter=recruiter_a, job_type="Part-Time",
-                        work_from="Hybrid",
+            job_c = Job(title="job_c", company=example_company_a, recruiter=recruiter_a, major=Major.LAW,
+                        job_type="Part-Time", work_from="Hybrid",
                         description="This is job c", city=City.objects.get(name="Tel Aviv-Yafo"), address="Rotchild 12",
                         date_created=datetime.date(2021, 7, 22))
             job_c.save()
 
-            job_d = Job(title="job_d", company=example_company_b, recruiter=recruiter_b, job_type="Internship",
-                        work_from="Remote-Only", description="This is job d", city=City.objects.get(name="Herziliyya"),
+            job_d = Job(title="job_d", company=example_company_b, recruiter=recruiter_b, major=Major.COMPUTER_SCIENCE,
+                        job_type="Internship", work_from="Remote-Only", description="This is job d",
+                        city=City.objects.get(name="Herziliyya"),
                         address="Herzel 2", date_created=datetime.date(2021, 10, 29))
             job_d.save()
 
-            job_e = Job(title="job_e", company=example_company_a, recruiter=recruiter_b, job_type="Part-Time",
-                        work_from="Office_Only", description="This is job e",
+            job_e = Job(title="job_e", company=example_company_a, recruiter=recruiter_b, major=Major.COMMUNICATIONS,
+                        job_type="Part-Time", work_from="Office_Only", description="This is job e",
                         city=City.objects.get(name="Beersheba"), address="Street 3",
                         date_created=datetime.date(2021, 3, 1))
             job_e.save()
