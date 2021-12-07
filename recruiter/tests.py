@@ -42,3 +42,11 @@ def test_get_all_recruiters_of_a_specified_company_returns_all_recruiters_as_a_q
         (example_recruiter.user.id, example_recruiter.name, example_recruiter.company.id, example_recruiter.email,
          example_recruiter.phone_number),
     ]
+
+
+@pytest.mark.django_db
+def test_if_user_is_a_recruiter_returns_true_if_the_auth_user_is_associated_with_a_recruiter_account(example_recruiter):
+    example_user_not_recruiter = User.objects.create_user("notrecruiter", "password")
+    example_user_not_recruiter.save()
+    assert Recruiter.is_recruiter(example_user_not_recruiter.id) is False
+    assert Recruiter.is_recruiter(example_recruiter.user.id) is True

@@ -84,3 +84,11 @@ def test_get_students_graduate_after_returns_students_that_graduate_after_the_gi
                 example_student_b.date_of_birth,
                 example_student_b.phone_number,
                 example_student_b.educational_institution.id, example_student_b.graduation_date)]
+
+
+@pytest.mark.django_db
+def test_if_user_is_a_student_returns_true_if_the_auth_user_is_associated_with_a_student_account(example_student_a):
+    example_user_not_student = User.objects.create_user("notstudent", "password")
+    example_user_not_student.save()
+    assert Student.is_student(example_user_not_student.id) is False
+    assert Student.is_student(example_student_a.user.id) is True
