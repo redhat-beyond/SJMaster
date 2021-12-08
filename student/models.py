@@ -58,3 +58,10 @@ class Student(models.Model):
         For recruiters to use when they want to view students according to their graduation year.
         """
         return cls.objects.filter(graduation_date__year__gte=year)
+
+    @classmethod
+    def is_student(cls, auth_user_id):
+        """
+        For checking if a currently logged in user is a Student
+        """
+        return cls.objects.filter(user_id=auth_user_id).exists()

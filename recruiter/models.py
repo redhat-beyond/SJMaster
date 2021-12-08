@@ -35,3 +35,10 @@ class Recruiter(models.Model):
 
     def __str__(self):
         return f'{self.name}'
+
+    @classmethod
+    def is_recruiter(cls, auth_user_id):
+        """
+        For checking if a currently logged in user is a Recruiter
+        """
+        return cls.objects.filter(user_id=auth_user_id).exists()
