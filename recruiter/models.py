@@ -42,3 +42,12 @@ class Recruiter(models.Model):
         For checking if a currently logged in user is a Recruiter
         """
         return cls.objects.filter(user_id=auth_user_id).exists()
+
+    @classmethod
+    def get_recruiter(cls, auth_user_id):
+        """
+        Returns the user as a recruiter object.
+        Should only be called after verifying that the user is
+        a recruiter with the is_recruiter method.
+        """
+        return cls.objects.get(user_id=auth_user_id)

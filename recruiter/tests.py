@@ -50,3 +50,16 @@ def test_if_user_is_a_recruiter_returns_true_if_the_auth_user_is_associated_with
     example_user_not_recruiter.save()
     assert Recruiter.is_recruiter(example_user_not_recruiter.id) is False
     assert Recruiter.is_recruiter(example_recruiter.user.id) is True
+
+
+@pytest.mark.django_db
+def test_get_user_as_recruiter_object(example_recruiter):
+    assert isinstance(Recruiter.get_recruiter(example_recruiter.user.id), Recruiter)
+
+
+@pytest.mark.django_db
+def test_get_recruiter_raises_exception_for_non_recruiter_user():
+    example_user_not_recruiter = User.objects.create_user("notrecruiter", "password")
+    example_user_not_recruiter.save()
+    with pytest.raises(Recruiter.DoesNotExist):
+        Recruiter.get_recruiter(example_user_not_recruiter.id)
