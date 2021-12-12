@@ -17,11 +17,13 @@ from django.contrib import admin
 from django.urls import path, include
 from jobboard.views import board
 from login.views import register_request
-
+from recruiter.views import UpdateRecruiterSettings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', board, name='board'),
     path("register/", register_request, name="register"),
-    path('', include("django.contrib.auth.urls"), name="login")
+    path('', include("django.contrib.auth.urls"), name="login"),
+    path('recruiter/account_settings/<slug:pk>', UpdateRecruiterSettings.as_view(),
+         name='recruiter_account_settings')
 ]
