@@ -1,5 +1,6 @@
 from django.db import models
 from recruiter.models import Company, Recruiter
+from student.models import Major
 import datetime
 
 
@@ -28,6 +29,7 @@ class JobTitleKeyword(models.Model):
 class Job(models.Model):
     title = models.CharField(max_length=255)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    major = models.CharField(max_length=3, choices=Major.choices, default=Major.UNDECIDED)
     recruiter = models.ForeignKey(
         Recruiter, on_delete=models.PROTECT, default=None)
     job_type = models.CharField(max_length=255, choices=[("Full-Time", "Full-Time"),
@@ -108,6 +110,14 @@ class Job(models.Model):
         Allows students to search for a job based on the company
         """
         return set(cls.objects.filter(recruiter__user_id=recruiter.user.id))
+
+    @classmethod
+    def get_jobs_by_major(cls, *majors):
+        """
+        Allows students to search for a job based on one or more university majors
+        majors parameter holds Major instances
+        """
+        return set(cls.objects.filter(major__in=majors))
 
     def __str__(self):
         return f"{self.title}, {self.company.name}"
