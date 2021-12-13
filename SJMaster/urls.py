@@ -17,7 +17,8 @@ from django.contrib import admin
 from django.urls import path, include
 from jobboard.views import board
 from login.views import register_request
-from recruiter.views import UpdateRecruiterSettings
+from recruiter.views import UpdateRecruiterSettings, CreateNewJobForm, job_created_successfully
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,5 +26,7 @@ urlpatterns = [
     path("register/", register_request, name="register"),
     path('', include("django.contrib.auth.urls"), name="login"),
     path('recruiter/account_settings/<slug:pk>', UpdateRecruiterSettings.as_view(),
-         name='recruiter_account_settings')
+         name='recruiter_account_settings'),
+    path('recruiter/create_new_job_form/', CreateNewJobForm.as_view(), name='create_new_job_form'),
+    path('job_created_successfully/', job_created_successfully, name='job_created')
 ]
