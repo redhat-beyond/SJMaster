@@ -1,26 +1,29 @@
-from django.shortcuts import render, HttpResponseRedirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Student
 from .forms import UpdateStudentAccountSettingsForm
 
 
 def account_update_success(request):
-    is_student = Student.is_student(request.user.id)
-    return render(request, 'account_settings_update_success.html', {"is_student": is_student})
+    context = {}
+    add_is_student_to_context(request, context)
+    return render(request, 'account_settings_update_success.html', context)
 
 
 def update_student_account_settings_view(request):
     context = {}
-    try:
-        student_object = Student.objects.get(user_id=request.user.id)
-    except Student.DoesNotExist:
-        return render(request, "dead_end.html")
+    student_object = get_object_or_404(Student, user_id=request.user.id)
     update_student_form = UpdateStudentAccountSettingsForm(request.POST or None, instance=student_object)
-    if update_student_form.is_valid():
-        update_student_form.save()
-        return HttpResponseRedirect("/account_update_success/")
-    context["form"] = update_student_form
     add_is_student_to_context(request, context)
-    return render(request, "student_account_settings.html", context)
+    context["form"] = update_student_form
+    if request.method == 'GET':
+        return render(request, "student_account_settings.html", context)
+
+    elif request.method == "POST" and update_student_form.is_valid():
+        update_student_form.save()
+        return redirect("/account_update_success/", context)
+
+    elif request.method == "POST" and not update_student_form.is_valid():
+        return render(request, "student_account_settings.html", context)
 
 
 def add_is_student_to_context(request, context):

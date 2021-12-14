@@ -19,7 +19,6 @@ from jobboard.views import board
 from login.views import register_request
 from recruiter.views import UpdateRecruiterSettings, CreateNewJobForm, job_created_successfully, \
     recruiter_view_my_jobs_and_applications
-from recruiter.views import UpdateRecruiterSettings, CreateNewJobForm, job_created_successfully
 from student.views import update_student_account_settings_view, account_update_success
 
 urlpatterns = [
