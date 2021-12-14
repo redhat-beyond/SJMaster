@@ -8,10 +8,25 @@ from django.shortcuts import render
 from django.views.generic import UpdateView, CreateView
 from jobboard.models import Job
 from recruiter.models import Recruiter
+from job_application.models import Application
 
 
 def job_created_successfully(request):
     return render(request, 'job_created_successfully.html')
+
+
+def recruiter_view_my_jobs_and_applications(request):
+    context = {}
+    try:
+        recruiter_object = Recruiter.objects.get(user_id=request.user.id)
+    except Recruiter.DoesNotExist:
+        return render(request, "dead_end.html")
+    recruiter_jobs = Job.get_jobs_by_recruiter_id(recruiter_object)
+    job_applications_dictionary = {}
+    for job in recruiter_jobs:
+        job_applications_dictionary[job] = list(Application.get_applications_by_job(job))
+    context["jobs_and_applications"] = job_applications_dictionary
+    return render(request, "recruiter_my_jobs_and_applications.html", context)
 
 
 class UpdateRecruiterSettings(UserPassesTestMixin, UpdateView):
