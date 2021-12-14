@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>My Jobs </h1>
+    {% for job, application_list in jobs_and_applications.items %}
+        <br>
+        <h3>{{ job.title }} </h3>
+        <h5>Applicants:</h5>
+        {% if application_list %}
+            <ul>
+            {% for application in application_list %}
+                <li>{{ application.student.full_name }}, studies
+                    at {{ application.student.educational_institution.name }}, graduates
+                    at {{ application.student.graduation_date }}, Contact
+                    Number: {{ application.student.phone_number }}</li>
+            {% endfor %}
+        {% else %}
+            <p> No applicants yet.</p>
+        {% endif %}
+    </ul>
+    {% endfor %}
+
+{% endblock %}
