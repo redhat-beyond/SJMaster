@@ -65,3 +65,12 @@ class Student(models.Model):
         For checking if a currently logged in user is a Student
         """
         return cls.objects.filter(user_id=auth_user_id).exists()
+
+    @classmethod
+    def get_student(cls, auth_user_id):
+        """
+        Returns the user as a student object.
+        Should only be called after verifying that the user is
+        a student with the is_student method.
+        """
+        return cls.objects.get(user_id=auth_user_id)

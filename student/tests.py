@@ -92,3 +92,16 @@ def test_if_user_is_a_student_returns_true_if_the_auth_user_is_associated_with_a
     example_user_not_student.save()
     assert Student.is_student(example_user_not_student.id) is False
     assert Student.is_student(example_student_a.user.id) is True
+
+
+@pytest.mark.django_db
+def test_get_user_as_student_object(example_student_a):
+    assert isinstance(Student.get_student(example_student_a.user.id), Student)
+
+
+@pytest.mark.django_db
+def test_get_student_raises_exception_for_non_student_user():
+    example_user_not_student = User.objects.create_user("notstudent", "password")
+    example_user_not_student.save()
+    with pytest.raises(Student.DoesNotExist):
+        Student.get_student(example_user_not_student.id)
