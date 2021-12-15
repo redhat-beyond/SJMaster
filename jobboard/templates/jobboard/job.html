@@ -1,0 +1,28 @@
+{% extends 'base.html' %} {% block content %}
+
+ <div class="container-fluid">
+    <div class="row">
+      <div class="col-md p-5 text-align">
+        <h3>{{ job_data.title }} at {{ job_data.company }}</h3>
+        <h5>{{ job_data.description }}</h5>
+
+          {% if user.is_authenticated %}
+            {% if is_student %}
+                {% if is_student_applied %}
+                    <p>YOU HAVE ALREADY APPLIED FOR THIS JOB</p>
+                {% else %}
+                    <button onclick="location.href = 'apply_for_job/{{ job.id }}'" type="submit">APPLY NOW</button>
+                {% endif %}
+            {% endif %}
+
+            {% if is_recruiter %}
+                {% if job_data.recruiter.user.id == user.id %}
+                    <button onclick="location.href = 'apply_for_job{{ job.id }}'" type="submit">Edit this job</button>
+                {% endif %}
+            {% endif %}
+          {% endif %}
+        <a href="/">Go back to all jobs</a>
+      </div>
+    </div>
+  </div>
+  {% endblock %}
