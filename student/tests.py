@@ -1,7 +1,7 @@
 import pytest
 from django.contrib.auth.models import User
 from django.db.models import QuerySet
-
+from student.forms import UpdateStudentAccountSettingsForm
 from student.models import Student, EducationalInstitution, Major
 from datetime import date
 
@@ -43,6 +43,19 @@ def example_student_b(example_institution_b):
                       graduation_date=date(2023, 7, 13))
     student.save()
     return student
+
+
+@pytest.fixture
+def example_student_a_data_as_dictionary(example_student_a):
+    example_student_a_data = {"full_name": example_student_a.full_name,
+                              "email": example_student_a.email,
+                              "date_of_birth": example_student_a.date_of_birth,
+                              "phone_number": example_student_a.phone_number,
+                              "educational_institution": example_student_a.educational_institution.id,
+                              "major": str(example_student_a.major),
+                              "about": example_student_a.about,
+                              "graduation_date": example_student_a.graduation_date}
+    return example_student_a_data
 
 
 @pytest.mark.django_db
@@ -105,3 +118,49 @@ def test_get_student_raises_exception_for_non_student_user():
     example_user_not_student.save()
     with pytest.raises(Student.DoesNotExist):
         Student.get_student(example_user_not_student.id)
+
+
+@pytest.mark.django_db
+def test_update_student_account_settings_forms_loads_correctly(example_student_a, example_student_a_data_as_dictionary,
+                                                               client):
+    client.force_login(example_student_a.user)
+    response = client.get("/student/account_settings/")
+    assert response.status_code == 200
+    form = response.context["form"]
+    form_initial_data = response.context["form"].initial
+    assert isinstance(form, UpdateStudentAccountSettingsForm)
+    assert all(form_initial_data[key] == example_student_a_data_as_dictionary[key] for key in form_initial_data)
+
+
+@pytest.mark.django_db
+def test_update_student_account_settings_with_invalid_data(example_student_a, example_student_a_data_as_dictionary,
+                                                           client):
+    invalid_email = "guy"
+    client.force_login(example_student_a.user)
+    example_student_a_data_as_dictionary["email"] = invalid_email
+    response = client.post("/student/account_settings/", data=example_student_a_data_as_dictionary)
+    assert response.status_code == 200
+    form = response.context["form"]
+    assert form.is_valid() is False
+
+
+@pytest.mark.django_db
+def test_update_student_account_settings_with_valid_data(example_student_a, example_student_a_data_as_dictionary,
+                                                         client):
+    new_email = "guyyafe@gmail.com"
+    new_full_name = "guy y"
+    new_about = "I like tests"
+    client.force_login(example_student_a.user)
+    example_student_a_data_as_dictionary["email"] = new_email
+    example_student_a_data_as_dictionary["full_name"] = new_full_name
+    example_student_a_data_as_dictionary["about"] = new_about
+    response = client.post("/student/account_settings/", data=example_student_a_data_as_dictionary)
+    assert response.status_code == 302
+    assert response.url == "/account_update_success/"
+    example_student_a_from_db = Student.objects.get(user_id=example_student_a.user.id)
+    # Test that the new data was updated in the DB
+    assert example_student_a_from_db.email == new_email
+    assert example_student_a_from_db.full_name == new_full_name
+    assert example_student_a_from_db.about == new_about
+    # Test that untouched data hasn't changed
+    assert example_student_a_from_db.educational_institution == example_student_a.educational_institution

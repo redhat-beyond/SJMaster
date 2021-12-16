@@ -19,15 +19,18 @@ from jobboard.views import board
 from login.views import register_request
 from recruiter.views import UpdateRecruiterSettings, CreateNewJobForm, job_created_successfully, \
     recruiter_view_my_jobs_and_applications
+from student.views import update_student_account_settings_view, account_update_success
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', board, name='board'),
     path("register/", register_request, name="register"),
     path('', include("django.contrib.auth.urls"), name="login"),
-    path('recruiter/account_settings/<slug:pk>', UpdateRecruiterSettings.as_view(),
-         name='recruiter_account_settings'),
+    path('recruiter/account_settings/<slug:pk>', UpdateRecruiterSettings.as_view(), name='recruiter_account_settings'),
     path('recruiter/create_new_job_form/', CreateNewJobForm.as_view(), name='create_new_job_form'),
     path('job_created_successfully/', job_created_successfully, name='job_created'),
-    path('myjobs', recruiter_view_my_jobs_and_applications, name='myjobs')
+    path('myjobs', recruiter_view_my_jobs_and_applications, name='myjobs'),
+    path('recruiter/account_settings/<slug:pk>', UpdateRecruiterSettings.as_view(), name='recruiter_account_settings'),
+    path('student/account_settings/', update_student_account_settings_view, name="student_account_settings"),
+    path('account_update_success/', account_update_success, name="account_update_success")
 ]
