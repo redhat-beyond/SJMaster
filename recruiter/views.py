@@ -26,6 +26,7 @@ def recruiter_view_my_jobs_and_applications(request):
     for job in recruiter_jobs:
         job_applications_dictionary[job] = list(Application.get_applications_by_job(job))
     context["jobs_and_applications"] = job_applications_dictionary
+    add_is_recruiter_to_context(request, context)
     return render(request, "recruiter_my_jobs_and_applications.html", context)
 
 
@@ -55,3 +56,7 @@ class CreateNewJobForm(CreateView, UserPassesTestMixin):
         form.instance.company = logged_recruiter.company
         form.instance.date_created = date.today()
         return super(CreateNewJobForm, self).form_valid(form)
+
+
+def add_is_recruiter_to_context(request, context):
+    context["is_recruiter"] = Recruiter.is_recruiter(request.user.id)

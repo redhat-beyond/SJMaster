@@ -1,8 +1,11 @@
 from django.shortcuts import render
+
+from student.views import add_is_student_to_context
 from .models import Job
 from datetime import date, timedelta
 from student.models import Student
 from recruiter.models import Recruiter
+from recruiter.views import add_is_recruiter_to_context
 
 
 def get_content_if_user_is_student(request):
@@ -44,4 +47,6 @@ def board(request):
         content = get_content_if_user_is_student(request)
     else:
         content = get_content_if_user_is_not_student(request, user_is_recruiter)
+    add_is_recruiter_to_context(request, content)
+    add_is_student_to_context(request, content)
     return render(request, 'jobboard/board.html', content)

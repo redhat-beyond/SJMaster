@@ -29,31 +29,40 @@
         >
           <span class="navbar-toggler-icon"></span>
         </button>
-
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-              <a class="nav-link" href="/">Job Search</a>
-            </li>
-            {% if user.is_authenticated %} {% if is_student %}
-            <li class="nav-item">
-              <a class="nav-link" href="/student/account_settings/"
-                >Account Settings</a
-              >
-            </li>
-            {% endif %}
-            <li class="nav-item">
-              <a class="nav-link" href="/logout">Logout</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Welcome, {{ user.username }}</a>
-            </li>
-            {% else %}
-            <li class="nav-item">
-              <a class="nav-link" href="/login">Login</a>
-            </li>
-            {% endif %}
-          </ul>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/">Job Search</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    {% if is_recruiter %}
+                     <li class="nav-item">
+                        <a class="nav-link" href="recruiter/account_settings/{{ user.id }}">Account Settings</a>
+                    </li>
+                     <li class="nav-item">
+                        <a class="nav-link" href="recruiter/create_new_job_form">Create job</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="myjobs">My jobs</a>
+                    </li>
+                    {% endif %}
+                    {% if is_student %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/student/account_settings/">Account Settings</a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Welcome, {{ user.username }}</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">Login</a>
+                    </li>
+                {% endif %}
+            </ul>
         </div>
       </nav>
     </header>
