@@ -1,56 +1,71 @@
-from django.shortcuts import (get_object_or_404,
-                              render,
-                              HttpResponseRedirect)
-from jobboard.models import Job
-from datetime import date
-# from .forms import JobForm
-
-from django.contrib.auth import get_user_model
-from django.views.generic import DetailView
-from django.views.generic.edit import UpdateView
-from django.contrib.auth.mixins import UserPassesTestMixin
-
+from datetime import date, timedelta
+from django.shortcuts import render
+from .models import Job
+from job_application.models import Application
+from recruiter.models import Recruiter
 from student.models import Student
-
-
-def board(request):
-    latest_jobs = Job.get_jobs_posted_on_or_after_specific_date(date(2021, 3, 1))
-    return render(request, 'jobboard/board.html', {'latest_jobs': latest_jobs})
-
-
-# def job(request):
-#     job_by_id = Job.objects.get(request.job.id)
-#     return render(request, 'jobboard/job.html', {"job_instance": job_by_id})
 
 
 # after updating it will redirect to detail_View
 def job_detail_view(request, id):
-    # dictionary for initial data with job's field names as keys
     context = dict()
-    is_student = Student.is_student(request.user.id)
-    # add the dictionary during initialization
     try:
-        context["data"] = Job.objects.get(id=id)
+        context["job_data"] = Job.objects.get(id=id)
+        # context["recruiter_job_owner"] =
     except Job.DoesNotExist:
         return render(request, "jobboard/no_such_job.html")
-    add_is_student_to_context(request, context)
+    context["is_student"] = Student.is_student(request.user.id)
+    context["is_recruiter"] = Recruiter.is_recruiter(request.user.id)
+
+    if context["is_student"]:
+        context["is_student_applied"] = check_if_student_already_applied(Student.get_student(request.user),
+                                                                         context["job_data"])
     return render(request, "jobboard/job.html", context)
 
 
-def add_is_student_to_context(request, context):
-    context["is_student"] = Student.is_student(request.user.id)
+def check_if_student_already_applied(student, job):
+    applications_for_current_job = set(Application.get_applications_by_job(job))
+    applications_for_current_student = set(Application.get_applications_by_student(student))
+    return len(applications_for_current_job.intersection(applications_for_current_student)) > 0
 
-#
-# def job_view(request):
-#     context = {}
-#
-#     # create object of form
-#     job_form_object = JobForm(request.GET or None, request.FILES or None)
-#
-#     # check if form data is valid
-#     if job_form_object.is_valid():
-#         # save the form data to model
-#         job_form_object.save()
-#
-#     context['form'] = job_form_object
-#     return render(request, "job.html", context)
+
+def get_content_if_user_is_student(request):
+    """
+    If the user is a student then the jobs that will automatically
+    be displayed will be jobs that correspond to that student's degree
+    """
+    user_as_student = Student.get_student(request.user.id)
+    jobs_by_student_major = Job.get_jobs_by_major(user_as_student.major)
+    content = {'jobs_to_display': jobs_by_student_major,
+               'user': request.user,
+               'user_is_student': True,
+               'user_is_recruiter': False,
+               'user_as_student': user_as_student}
+    return content
+
+
+def get_content_if_user_is_not_student(request, user_is_recruiter):
+    """
+    If the user is not a student then the jobs that will automatically
+    be displayed will be jobs that have been created in the past 6 months
+    """
+    date_six_months_ago = date.today() - timedelta(days=180)
+    latest_jobs = Job.get_jobs_posted_on_or_after_specific_date(
+        date_six_months_ago)
+    content = {'jobs_to_display': latest_jobs,
+               'user': request.user,
+               'user_is_student': False,
+               'user_is_recruiter': user_is_recruiter}
+    if user_is_recruiter:
+        content['user_as_recruiter'] = Recruiter.get_recruiter(request.user.id)
+    return content
+
+
+def board(request):
+    user_is_student = Student.is_student(request.user.id)
+    user_is_recruiter = Recruiter.is_recruiter(request.user.id)
+    if user_is_student:
+        content = get_content_if_user_is_student(request)
+    else:
+        content = get_content_if_user_is_not_student(request, user_is_recruiter)
+    return render(request, 'jobboard/board.html', content)

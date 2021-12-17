@@ -15,11 +15,11 @@
                 {% endif %}
             {% endif %}
 
-            {% if is_recruiter %}
-                {% if job_data.recruiter.user.id == user.id %}
-                    <button onclick="location.href = 'apply_for_job{{ job.id }}'" type="submit">Edit this job</button>
-                {% endif %}
-            {% endif %}
+<!--            {% if is_recruiter %}-->
+<!--                {% if job_data.recruiter.user.id == user.id %}-->
+<!--                    <button onclick="location.href = 'apply_for_job{{ job.id }}'" type="submit">Edit this job</button>-->
+<!--                {% endif %}-->
+<!--            {% endif %}-->
           {% endif %}
         <a href="/">Go back to all jobs</a>
       </div>
