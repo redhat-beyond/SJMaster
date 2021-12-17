@@ -1,12 +1,11 @@
-from datetime import date, timedelta
 from django.shortcuts import render
 from .models import Job
 from job_application.models import Application
-from recruiter.models import Recruiter
+from datetime import date, timedelta
 from student.models import Student
+from recruiter.models import Recruiter
 
 
-# after updating it will redirect to detail_View
 def job_detail_view(request, id):
     context = dict()
     try:

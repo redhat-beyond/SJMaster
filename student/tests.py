@@ -1,9 +1,10 @@
 import pytest
 from django.contrib.auth.models import User
 from django.db.models import QuerySet
-
+from student.forms import UpdateStudentAccountSettingsForm
 from student.models import Student, EducationalInstitution, Major
 from datetime import date
+from student.forms import StudentRegistrationForm
 
 
 @pytest.fixture
@@ -45,19 +46,85 @@ def example_student_b(example_institution_b):
     return student
 
 
+@pytest.fixture
+def example_student_a_data_as_dictionary(example_student_a):
+    example_student_a_data = {"full_name": example_student_a.full_name,
+                              "email": example_student_a.email,
+                              "date_of_birth": example_student_a.date_of_birth,
+                              "phone_number": example_student_a.phone_number,
+                              "educational_institution": example_student_a.educational_institution.id,
+                              "major": str(example_student_a.major),
+                              "about": example_student_a.about,
+                              "graduation_date": example_student_a.graduation_date}
+    return example_student_a_data
+
+
+@pytest.fixture
+def invalid_student_data(example_institution_b):
+    # username can't be none
+    users_data = [
+        {'username': "", 'email': "yarin@example.com",
+         'password1': "Y123456789", 'password2': "Y123456789",
+                      'full_name': "yarin bouzaglo",
+                      'date_of_birth': date(2023, 7, 13),
+                      'phone_number': "0434465794",
+                      'educational_institution': example_institution_b,
+                      'major': Major.COMPUTER_SCIENCE,
+                      'about': "testing",
+                      "graduation_date": date(2023, 7, 13)},
+        # invalid email
+        {'username': "yarinTheStudent", 'email': "yarinexample.com",
+         'password1': "Y123456789", 'password2': "Y123456789",
+                      'full_name': "yarin bouzaglo",
+                      'date_of_birth': date(2023, 7, 13),
+                      'phone_number': "0434465794",
+                      'educational_institution': example_institution_b,
+                      'major': Major.COMPUTER_SCIENCE,
+                      'about': "testing",
+                      "graduation_date": date(2023, 7, 13)},
+        # passwords don't match
+        {'username': "yarinTheStudent", 'email': "yarin@example.com",
+         'password1': "Y12349", 'password2': "Y123456789",
+                      'full_name': "yarin bouzaglo",
+                      'date_of_birth': date(2023, 7, 13),
+                      'phone_number': "0434465794",
+                      'educational_institution': example_institution_b,
+                      'major': Major.COMPUTER_SCIENCE,
+                      'about': "testing",
+                      "graduation_date": date(2023, 7, 13)}]
+    return users_data
+
+
+@pytest.fixture
+def valid_student_data(example_institution_b):
+    student_data = {'username': "david", 'email': "david@example.com",
+                    'password1': "Y123456789", 'password2': "Y123456789",
+                    'full_name': "david ger",
+                    'date_of_birth': date(2023, 7, 13),
+                    'phone_number': "0434465794",
+                    'educational_institution': example_institution_b.id,
+                    'major': Major.COMPUTER_SCIENCE,
+                    'about': "testing",
+                    "graduation_date": date(2023, 7, 13)}
+    return student_data
+
+
 @pytest.mark.django_db
 def test_get_institutions_with_enrolled_students_returns_institutions_with_enrolled_students_as_query_set(
         example_student_a, example_institution_a, example_institution_b):
     institution_query_set = EducationalInstitution.get_institutions_with_enrolled_students()
     assert isinstance(institution_query_set, QuerySet)
-    assert all(isinstance(inst, EducationalInstitution) for inst in institution_query_set)
-    assert list(institution_query_set.values_list("name")) == [(example_institution_a.name,)]
+    assert all(isinstance(inst, EducationalInstitution)
+               for inst in institution_query_set)
+    assert list(institution_query_set.values_list("name")) == [
+        (example_institution_a.name,)]
 
 
 @pytest.mark.django_db
 def test_get_students_enrolled_at_given_institutions_returns_students_enrolled_at_the_given_institutions_as_a_query_set(
         example_institution_a, example_institution_b, example_student_a, example_student_b):
-    students_query_set = Student.get_students_enrolled_at_specified_institutions([example_institution_a])
+    students_query_set = Student.get_students_enrolled_at_specified_institutions([
+                                                                                 example_institution_a])
     assert isinstance(students_query_set, QuerySet)
     assert all(isinstance(student, Student) for student in students_query_set)
     assert list(
@@ -73,9 +140,11 @@ def test_get_students_enrolled_at_given_institutions_returns_students_enrolled_a
 @pytest.mark.django_db
 def test_get_students_graduate_after_returns_students_that_graduate_after_the_given_year_as_query_set(
         example_student_a, example_student_b):
-    students_grad_after_2023_query_set = Student.get_students_that_graduate_after_specified_year(2023)
+    students_grad_after_2023_query_set = Student.get_students_that_graduate_after_specified_year(
+        2023)
     assert isinstance(students_grad_after_2023_query_set, QuerySet)
-    assert all(isinstance(student, Student) for student in students_grad_after_2023_query_set)
+    assert all(isinstance(student, Student)
+               for student in students_grad_after_2023_query_set)
     assert list(
         students_grad_after_2023_query_set.values_list("user", "full_name", "email", "date_of_birth", "phone_number",
                                                        "educational_institution",
@@ -88,7 +157,8 @@ def test_get_students_graduate_after_returns_students_that_graduate_after_the_gi
 
 @pytest.mark.django_db
 def test_if_user_is_a_student_returns_true_if_the_auth_user_is_associated_with_a_student_account(example_student_a):
-    example_user_not_student = User.objects.create_user("notstudent", "password")
+    example_user_not_student = User.objects.create_user(
+        "notstudent", "password")
     example_user_not_student.save()
     assert Student.is_student(example_user_not_student.id) is False
     assert Student.is_student(example_student_a.user.id) is True
@@ -101,7 +171,104 @@ def test_get_user_as_student_object(example_student_a):
 
 @pytest.mark.django_db
 def test_get_student_raises_exception_for_non_student_user():
-    example_user_not_student = User.objects.create_user("notstudent", "password")
+    example_user_not_student = User.objects.create_user(
+        "notstudent", "password")
     example_user_not_student.save()
     with pytest.raises(Student.DoesNotExist):
         Student.get_student(example_user_not_student.id)
+
+
+@pytest.mark.django_db
+def test_update_student_account_settings_forms_loads_correctly(example_student_a, example_student_a_data_as_dictionary,
+                                                               client):
+    client.force_login(example_student_a.user)
+    response = client.get("/student/account_settings/")
+    assert response.status_code == 200
+    form = response.context["form"]
+    form_initial_data = response.context["form"].initial
+    assert isinstance(form, UpdateStudentAccountSettingsForm)
+    assert all(form_initial_data[key] == example_student_a_data_as_dictionary[key]
+               for key in form_initial_data)
+
+
+@pytest.mark.django_db
+def test_update_student_account_settings_with_invalid_data(example_student_a, example_student_a_data_as_dictionary,
+                                                           client):
+    invalid_email = "guy"
+    client.force_login(example_student_a.user)
+    example_student_a_data_as_dictionary["email"] = invalid_email
+    response = client.post("/student/account_settings/",
+                           data=example_student_a_data_as_dictionary)
+    assert response.status_code == 200
+    form = response.context["form"]
+    assert form.is_valid() is False
+
+
+@pytest.mark.django_db
+def test_update_student_account_settings_with_valid_data(example_student_a, example_student_a_data_as_dictionary,
+                                                         client):
+    new_email = "guyyafe@gmail.com"
+    new_full_name = "guy y"
+    new_about = "I like tests"
+    client.force_login(example_student_a.user)
+    example_student_a_data_as_dictionary["email"] = new_email
+    example_student_a_data_as_dictionary["full_name"] = new_full_name
+    example_student_a_data_as_dictionary["about"] = new_about
+    response = client.post("/student/account_settings/",
+                           data=example_student_a_data_as_dictionary)
+    assert response.status_code == 302
+    assert response.url == "/account_update_success/"
+    example_student_a_from_db = Student.objects.get(
+        user_id=example_student_a.user.id)
+    # Test that the new data was updated in the DB
+    assert example_student_a_from_db.email == new_email
+    assert example_student_a_from_db.full_name == new_full_name
+    assert example_student_a_from_db.about == new_about
+    # Test that untouched data hasn't changed
+    assert example_student_a_from_db.educational_institution == example_student_a.educational_institution
+
+
+@pytest.mark.django_db
+def test_sign_up_valid_student(valid_student_data):
+    form = StudentRegistrationForm(data=valid_student_data)
+    if form.is_valid():
+        user = form.save()
+        assert User.objects.filter(pk=user.user.id).exists()
+        assert Student.objects.filter(pk=user).exists()
+    else:
+        assert False
+
+
+@pytest.mark.django_db
+def test_sign_up_invalid_student(invalid_student_data):
+    for user_data in invalid_student_data:
+        invalid = False
+        form = StudentRegistrationForm(data=user_data)
+        try:
+            form.save()
+        except ValueError:
+            invalid = True
+            assert invalid
+
+
+@pytest.mark.django_db
+def test_signup_form_for_student_loads_correctly(valid_student_data, client):
+    response = client.post("/registerStudent/")
+    assert response.status_code == 200
+    form = response.context["form"]
+    form_initial_data = response.context["form"].initial
+    assert isinstance(form, StudentRegistrationForm)
+    assert all(form_initial_data[key] == valid_student_data[key] for key in form_initial_data)
+
+
+@pytest.mark.django_db
+def test_new_student_account_with_valid_data(valid_student_data, client):
+    response = client.post("/registerStudent/", data=valid_student_data)
+    assert response.status_code == 302
+    user = User.objects.get(username=valid_student_data["username"])
+    example_student_from_db = Student.objects.get(user_id=user.id)
+    assert example_student_from_db.full_name == valid_student_data["full_name"]
+    assert example_student_from_db.date_of_birth == valid_student_data["date_of_birth"]
+    assert example_student_from_db.phone_number == valid_student_data["phone_number"]
+    assert example_student_from_db.about == valid_student_data["about"]
+    assert example_student_from_db.graduation_date == valid_student_data["graduation_date"]

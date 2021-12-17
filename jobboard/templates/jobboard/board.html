@@ -1,43 +1,46 @@
 {% extends 'base.html' %} {% block content %}
 
 <div class="container-fluid">
-  <div class="row">
-    <div class="col-2">
-      <div class="user-info">
-        <div class="container-fluid">
-          {% if user_is_student or user_is_recruiter %}
-          <h2>{{user.first_name}} {{user.last_name}}</h2>
-          {% if user_is_student %}
-          <h4>{{user_as_student.educational_institution}}</h4>
-          {% endif %} {% if user_is_recruiter %}
-          <h4>{{user_as_recruiter.company}}</h4>
-          {% endif %} {% endif %}
+    <div class="row">
+        <div class="col-2">
+            <div class="user-info">
+                <div class="container-fluid">
+                    {% if user_is_student or user_is_recruiter %}
+                    <h2>{{user.first_name}} {{user.last_name}}</h2>
+                    {% if user_is_student %}
+                    <h4>{{user_as_student.educational_institution}}</h4>
+                    {% endif %} {% if user_is_recruiter %}
+                    <h4>{{user_as_recruiter.company}}</h4>
+                    {% endif %} {% endif %}
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="col-10 text-center">
-      <div class="row">
-        {% if user_is_student %}
-        <h3>Here are some jobs that match your profile</h3>
-        {% else %}
-        <h3>Here are jobs created in the last 6 months</h3>
-        {% endif %} {% for job in jobs_to_display %}
-        <div class="col-6 p-5 text-center">
-          <div class="jobs">
-            <ul class="list-group">
-              <li class="list-group-item">{{job.title}}</li>
-              <li class="list-group-item">Added {{job.date_created}}</li>
-              <li class="list-group-item">{{job.company}}</li>
-              <li class="list-group-item">{{job.job_type}}</li>
-              <li class="list-group-item">{{job.city}}</li>
-              <li class="list-group-item"><button class="list-group-item" onclick = "location.href ='/job/{{ job.id }}'">Read more</button></li>
-            </ul>
-          </div>
+        <div class="col-10 text-center">
+            <div class="row">
+                {% if user_is_student %}
+                <h3>Here are some jobs that match your profile</h3>
+                {% else %}
+                <h3>Here are jobs created in the last 6 months</h3>
+                {% endif %} {% for job in jobs_to_display %}
+                <div class="col-6 p-5 text-center">
+                    <div class="jobs">
+                        <ul class="list-group">
+                            <li class="list-group-item">{{job.title}}</li>
+                            <li class="list-group-item">Added {{job.date_created}}</li>
+                            <li class="list-group-item">{{job.company}}</li>
+                            <li class="list-group-item">{{job.job_type}}</li>
+                            <li class="list-group-item">{{job.city}}</li>
+                            <li class="list-group-item">
+                                <button class="list-group-item" onclick="location.href ='/job/{{ job.id }}'">Read more
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
         </div>
-        {% endfor %}
-      </div>
     </div>
-  </div>
 </div>
-
 {% endblock %}
+

@@ -15,23 +15,49 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from login.views import register_request
 from job_application.views import add_student_to_job_application
-from recruiter.views import UpdateRecruiterSettings, CreateNewJobForm, job_created_successfully, \
-    recruiter_view_my_jobs_and_applications
 from jobboard.views import board, job_detail_view
+from jobboard.views import board
+from student.views import update_student_account_settings_view, account_update_success
+from recruiter.views import (UpdateRecruiterSettings,
+                             CreateNewJobForm,
+                             job_created_successfully,
+                             recruiterRegister,
+                             recruiter_created_successfully,
+                             recruiter_view_my_jobs_and_applications,)
+from student.views import studentRegister, student_created_successfully
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', board, name='board'),
-    path("register/", register_request, name="register"),
     path('', include("django.contrib.auth.urls"), name="login"),
-    path('recruiter/account_settings/<slug:pk>', UpdateRecruiterSettings.as_view(),
-         name='recruiter_account_settings'),
-    path('recruiter/create_new_job_form/', CreateNewJobForm.as_view(), name='create_new_job_form'),
-    path('job_created_successfully/', job_created_successfully, name='job_created'),
+    path('recruiter/account_settings/<slug:pk>',
+         UpdateRecruiterSettings.as_view(), name='recruiter_account_settings'),
+    path('recruiter/create_new_job_form/',
+         CreateNewJobForm.as_view(), name='create_new_job_form'),
+    path('job_created_successfully/',
+         job_created_successfully, name='job_created'),
     path('myjobs', recruiter_view_my_jobs_and_applications, name='myjobs'),
+    path('recruiter/account_settings/<slug:pk>',
+         UpdateRecruiterSettings.as_view(), name='recruiter_account_settings'),
+    path('student/account_settings/', update_student_account_settings_view,
+         name="student_account_settings"),
+    path('account_update_success/', account_update_success,
+         name="account_update_success"),
+    path('recruiter/account_settings/<slug:pk>',
+         UpdateRecruiterSettings.as_view(), name='recruiter_account_settings'),
+    path('student/account_settings/', update_student_account_settings_view,
+         name="student_account_settings"),
+    path('account_update_success/', account_update_success,
+         name="account_update_success"),
+    path('registerStudent/', studentRegister, name='registerStudent'),
+    path('recruiterRegister/', recruiterRegister, name='recruiterRegister'),
+    path('recruiter_created_successfully/', recruiter_created_successfully,
+         name='recruiter_created_successfully'),
+    path('student_created_successfully/', student_created_successfully,
+         name='student_created_successfully')
     path('job/<slug:id>/', job_detail_view),
     path('job/<slug:id>/apply_for_job/', add_student_to_job_application)
+
 ]

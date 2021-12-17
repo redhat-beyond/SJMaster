@@ -1,14 +1,12 @@
-# from django.shortcuts import render
-
-# Create your views here.
-
-from datetime import date
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import RecuiterRegistrationForm
 from django.contrib.auth.mixins import UserPassesTestMixin
-from django.shortcuts import render
 from django.views.generic import UpdateView, CreateView
 from jobboard.models import Job
 from recruiter.models import Recruiter
 from job_application.models import Application
+from datetime import date
 
 
 def job_created_successfully(request):
@@ -24,7 +22,8 @@ def recruiter_view_my_jobs_and_applications(request):
     recruiter_jobs = Job.get_jobs_by_recruiter_id(recruiter_object)
     job_applications_dictionary = {}
     for job in recruiter_jobs:
-        job_applications_dictionary[job] = list(Application.get_applications_by_job(job))
+        job_applications_dictionary[job] = list(
+            Application.get_applications_by_job(job))
     context["jobs_and_applications"] = job_applications_dictionary
     return render(request, "recruiter_my_jobs_and_applications.html", context)
 
@@ -55,3 +54,22 @@ class CreateNewJobForm(CreateView, UserPassesTestMixin):
         form.instance.company = logged_recruiter.company
         form.instance.date_created = date.today()
         return super(CreateNewJobForm, self).form_valid(form)
+
+
+def recruiterRegister(request):
+    if request.method == 'POST':
+        form = RecuiterRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            message = "Your account has been created. You can log in now!"
+            messages.success(request, f'{message}')
+            return redirect('/recruiter_created_successfully')
+    else:
+        form = RecuiterRegistrationForm()
+
+    context = {'form': form}
+    return render(request, 'recruiter/registerRecruiter.html', context)
+
+
+def recruiter_created_successfully(request):
+    return render(request, 'recruiter/recruiter_created_successfully.html')
