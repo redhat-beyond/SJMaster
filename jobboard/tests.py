@@ -1,10 +1,32 @@
 import pytest
+from pytest_django.asserts import assertTemplateUsed
 from jobboard.models import Job
 from student.models import Major
-import datetime
+from datetime import date, timedelta
+from django.contrib.auth.models import User
+from student.models import Student, EducationalInstitution
+from recruiter.models import Recruiter
 
 
 # The tests use the data that is already in the db from the migration files
+
+@pytest.fixture
+def example_institution_a():
+    institution = EducationalInstitution(name="A")
+    institution.save()
+    return institution
+
+
+@pytest.fixture
+def example_student_a(example_institution_a):
+    example_user = User.objects.create_user("test", "testpassword")
+    example_user.save()
+    student = Student(user=example_user, full_name="test user", email="test@test.com", date_of_birth=date(2020, 7, 13),
+                      phone_number="0000000000", educational_institution=example_institution_a,
+                      major=Major.COMPUTER_SCIENCE, about="testing", graduation_date=date(2020, 7, 13))
+    student.save()
+    return student
+
 
 @pytest.mark.django_db
 def test_get_jobs_by_company_name():
@@ -83,7 +105,7 @@ def test_get_jobs_posted_on_or_after_specific_date():
     job_d = Job.objects.get(title="job_d")
     jobs_created_from_specific_date_added_manually = {job_b, job_c, job_d}
     jobs_created_from_specific_date_from_function = \
-        Job.get_jobs_posted_on_or_after_specific_date(datetime.date(2021, 7, 15))
+        Job.get_jobs_posted_on_or_after_specific_date(date(2021, 7, 15))
     assert jobs_created_from_specific_date_added_manually == jobs_created_from_specific_date_from_function
 
 
@@ -112,3 +134,51 @@ def test_get_jobs_by_major():
     # tests function by two majors "Major.COMPUTER_SCIENCE" and "Major.LAW"
     assert jobs_by_computer_science_and_law_major_from_test_function == \
            jobs_by_computer_science_and_law_major_added_manually
+
+
+@pytest.mark.django_db
+def test_page_display_to_user_that_is_not_student_and_not_recruiter(client):
+    example_user = User.objects.create_user("username", "password")
+    client.force_login(example_user)
+    response = client.get("/")
+    assert response.status_code == 200
+    assertTemplateUsed(response, 'jobboard/board.html')
+    assert response.context['user'] == example_user
+    assert response.context['user_is_student'] is False
+    assert response.context['user_is_recruiter'] is False
+    date_six_months_ago = date.today() - timedelta(days=180)
+    jobs_to_display = Job.get_jobs_posted_on_or_after_specific_date(date_six_months_ago)
+    # test that jobs displayed are only jobs created 6 months ago
+    assert response.context['jobs_to_display'] == jobs_to_display
+
+
+@pytest.mark.django_db
+def test_page_display_to_user_that_is_student(client, example_student_a):
+    client.force_login(example_student_a.user)
+    response = client.get("/")
+    assert response.status_code == 200
+    assertTemplateUsed(response, 'jobboard/board.html')
+    assert response.context['user'] == example_student_a.user
+    assert response.context['user_is_student'] is True
+    assert response.context['user_is_recruiter'] is False
+    assert response.context['user_as_student'] == example_student_a
+    jobs_by_student_major = Job.get_jobs_by_major(example_student_a.major)
+    # test that jobs displayed are only jobs corresponding to the student's major
+    assert response.context['jobs_to_display'] == jobs_by_student_major
+
+
+@pytest.mark.django_db
+def test_page_display_to_user_that_is_recruiter(client):
+    example_recruiter_a_from_db = Recruiter.objects.get(name='a')
+    client.force_login(example_recruiter_a_from_db.user)
+    response = client.get("/")
+    assert response.status_code == 200
+    assertTemplateUsed(response, 'jobboard/board.html')
+    assert response.context['user'] == example_recruiter_a_from_db.user
+    assert response.context['user_is_student'] is False
+    assert response.context['user_is_recruiter'] is True
+    assert response.context['user_as_recruiter'] == example_recruiter_a_from_db
+    date_six_months_ago = date.today() - timedelta(days=180)
+    jobs_to_display = Job.get_jobs_posted_on_or_after_specific_date(date_six_months_ago)
+    # test that jobs displayed are only jobs created 6 months ago
+    assert response.context['jobs_to_display'] == jobs_to_display
