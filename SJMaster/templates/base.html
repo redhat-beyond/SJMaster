@@ -35,18 +35,15 @@
             <li class="nav-item active">
               <a class="nav-link" href="/">Job Search</a>
             </li>
-            {% if user.is_authenticated %} {% if is_student %}
+            {% if user.is_authenticated %}
             <li class="nav-item">
-              <a class="nav-link" href="/student/account_settings/"
-                >Account Settings</a
-              >
+              <a class="nav-link" href="#">Account Settings</a>
             </li>
-            {% endif %}
             <li class="nav-item">
               <a class="nav-link" href="/logout">Logout</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Welcome, {{ user.username }}</a>
+              <a class="nav-link" href="#">Welcome, {{user.username}}</a>
             </li>
             {% else %}
             <li class="nav-item">
@@ -60,7 +57,7 @@
 
     <main role="main" class="container">
       <div class="row">
-        <div class="col-md">{% block content %}{% endblock %}</div>
+        <div class="col-md-8">{% block content %}{% endblock %}</div>
       </div>
     </main>
     <script
