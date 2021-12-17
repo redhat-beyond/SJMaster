@@ -1,18 +1,11 @@
 from django.contrib import messages
 from .forms import RecuiterRegistrationForm
-from django.contrib.auth.mixins import UserPassesTestMixin
-from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import CreateView
+from django.shortcuts import render, redirect, get_object_or_404
 from jobboard.models import Job
 from recruiter.models import Recruiter
 from job_application.models import Application
-from datetime import date
 import jobboard.views
 from .forms import UpdateRecruiterAccountSettingsForm
-
-
-def job_created_successfully(request):
-    return render(request, 'job_created_successfully.html')
 
 
 def recruiter_view_my_jobs_and_applications(request):
@@ -48,24 +41,6 @@ def update_recruiter_account_settings_view(request):
 
     elif request.method == "POST" and not update_recruiter_form.is_valid():
         return render(request, "recruiter_account_settings.html", context)
-
-
-class CreateNewJobForm(CreateView, UserPassesTestMixin):
-    model = Job
-    fields = (
-        'title', 'job_type', 'work_from', 'description', 'city', 'address', 'title_keywords')
-    template_name = 'create_new_job_form.html'
-    success_url = '/job_created_successfully'
-
-    def test_func(self):
-        return Recruiter.is_recruiter(self.request.user.id)
-
-    def form_valid(self, form):
-        logged_recruiter = Recruiter.objects.get(user_id=self.request.user.id)
-        form.instance.recruiter = logged_recruiter
-        form.instance.company = logged_recruiter.company
-        form.instance.date_created = date.today()
-        return super(CreateNewJobForm, self).form_valid(form)
 
 
 def recruiterRegister(request):

@@ -1,5 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 
+import jobboard
+from .forms import CreateNewJobForm
 from .models import Job
 from datetime import date, timedelta
 from student.models import Student
@@ -62,3 +64,24 @@ def add_navbar_links_to_context(request, context):
         context['navbar_links'] = {"Logout": "/logout"}
     else:
         context['navbar_links'] = {"Login": "/login"}
+
+
+def create_new_job_form(request):
+    recruiter_object = get_object_or_404(Recruiter, user_id=request.user.id)
+    form = CreateNewJobForm()
+    context = {}
+    if request.method == 'POST':
+        form = CreateNewJobForm(request.POST)
+        if form.is_valid():
+            form.instance.company = recruiter_object.company
+            form.instance.recruiter = recruiter_object
+            form.instance.date_created = date.today()
+            form.save()
+            return redirect("/job_created_successfully/", context)
+    context = {'form': form}
+    jobboard.views.add_navbar_links_to_context(request, context)
+    return render(request, "create_new_job_form.html", context)
+
+
+def job_created_successfully(request):
+    return render(request, 'job_created_successfully.html')
