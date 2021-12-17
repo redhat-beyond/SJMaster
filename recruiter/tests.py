@@ -2,9 +2,8 @@ import pytest
 from django.contrib.auth.models import User
 from django.db.models import QuerySet
 from pytest_django.asserts import assertTemplateUsed
-
 from recruiter.models import Company, Recruiter
-from recruiter.forms import RecuiterRegistrationForm
+from recruiter.forms import RecuiterRegistrationForm, UpdateRecruiterAccountSettingsForm
 from jobboard.models import Job
 from job_application.models import Application
 from student.models import EducationalInstitution, Student
@@ -20,9 +19,10 @@ def example_user():
 
 @pytest.fixture
 def example_recruiter(example_user):
-    recruiter = Recruiter(user=example_user, name="yarin bouzaglo",
-                          company=Company.objects.get(name="example_company_a"), email="test@yarin@example.com",
-                          phone_number="0524434795")
+    recruiter = Recruiter(user=example_user, name="test_recruiter",
+                          company=Company.objects.get(name="example_company_a"), email="test@email",
+                          phone_number="0543534343")
+
     recruiter.save()
     return recruiter
 
@@ -193,7 +193,7 @@ def test_new_recruiter_account_with_valid_data(valid_recruiter_data, client):
 
 
 @pytest.mark.django_db
-def test_recruiter_my_jobs_loads_correct_data(example_recruiter, example_job_application, client):
+def test_recruiter_my_jobs_loads_correct_data(client):
     recruiter_object = Recruiter.objects.get(name="a")
     client.force_login(recruiter_object.user)
     response = client.get("/myjobs")
@@ -217,3 +217,62 @@ def test_student_user_cannot_access_my_jobs_page(example_student, client):
 def test_user_not_student_or_recruiter_cannot_access_my_jobs_page(client):
     response = client.get("/myjobs")
     assert response.status_code == 404
+
+
+@pytest.fixture
+def example_recruiter_data_as_dictionary(example_recruiter):
+    example_recruiter_data = {"name": example_recruiter.name,
+                              "company": example_recruiter.company.id,
+                              "email": example_recruiter.email,
+                              "phone_number": example_recruiter.phone_number}
+    return example_recruiter_data
+
+
+@pytest.mark.django_db
+def test_update_recruiter_account_settings_forms_loads_correctly(example_recruiter,
+                                                                 example_recruiter_data_as_dictionary,
+                                                                 client):
+    client.force_login(example_recruiter.user)
+    response = client.get("/recruiter/account_settings/")
+    assert response.status_code == 200
+    assertTemplateUsed(response, 'recruiter_account_settings.html')
+    form = response.context["form"]
+    form_initial_data = response.context["form"].initial
+    assert isinstance(form, UpdateRecruiterAccountSettingsForm)
+    assert all(form_initial_data[key] == example_recruiter_data_as_dictionary[key] for key in form_initial_data)
+
+
+@pytest.mark.django_db
+def test_update_recruiter_account_settings_with_invalid_data(example_recruiter, example_recruiter_data_as_dictionary,
+                                                             client):
+    invalid_email = "bbb"
+    client.force_login(example_recruiter.user)
+    example_recruiter_data_as_dictionary["email"] = invalid_email
+    response = client.post("/recruiter/account_settings/", data=example_recruiter_data_as_dictionary)
+    assert response.status_code == 200
+    assertTemplateUsed(response, 'recruiter_account_settings.html')
+    form = response.context["form"]
+    assert form.is_valid() is False
+
+
+@pytest.mark.django_db
+def test_update_recruiter_account_settings_with_valid_data(example_recruiter, example_recruiter_data_as_dictionary,
+                                                           client):
+    new_email = "ben12@gmail.com"
+    new_name = "ben b"
+    new_phone_number = "0505323232"
+    request = client.force_login(example_recruiter.user)
+    assertTemplateUsed(request, 'recruiter_account_settings.html')
+    example_recruiter_data_as_dictionary["email"] = new_email
+    example_recruiter_data_as_dictionary["name"] = new_name
+    example_recruiter_data_as_dictionary["phone_number"] = new_phone_number
+    response = client.post("/recruiter/account_settings/", data=example_recruiter_data_as_dictionary)
+    assert response.status_code == 302
+    assert response.url == "/account_update_success/"
+    example_recruiter_from_db = Recruiter.objects.get(user_id=example_recruiter.user.id)
+    # Test that the new data was updated in the DB
+    assert example_recruiter_from_db.email == new_email
+    assert example_recruiter_from_db.name == new_name
+    assert example_recruiter_from_db.phone_number == new_phone_number
+    # Test that untouched data hasn't changed
+    assert example_recruiter_from_db.company == example_recruiter.company
