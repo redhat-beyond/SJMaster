@@ -6,6 +6,7 @@ from .models import Job
 from datetime import date, timedelta
 from student.models import Student
 from recruiter.models import Recruiter
+from job_application.models import Application
 
 
 def get_content_if_user_is_student(request):
@@ -85,3 +86,26 @@ def create_new_job_form(request):
 
 def job_created_successfully(request):
     return render(request, 'job_created_successfully.html')
+
+
+def job_detail_view(request, id):
+    context = dict()
+    try:
+        context["job_data"] = Job.objects.get(id=id)
+        # add edit page for recruiter - context["recruiter_job_owner"] =...
+    except Job.DoesNotExist:
+        return render(request, "jobboard/no_such_job.html")
+
+    context["is_student"] = Student.is_student(request.user.id)
+    context["is_recruiter"] = Recruiter.is_recruiter(request.user.id)
+
+    if context["is_student"]:
+        context["is_student_applied"] = check_if_student_already_applied(Student.get_student(request.user),
+                                                                         context["job_data"])
+    return render(request, "jobboard/job.html", context)
+
+
+def check_if_student_already_applied(student, job):
+    applications_for_current_job = set(Application.get_applications_by_job(job))
+    applications_for_current_student = set(Application.get_applications_by_student(student))
+    return len(applications_for_current_job.intersection(applications_for_current_student)) > 0
