@@ -34,6 +34,7 @@ class StudentRegistrationForm(UserCreationForm):
             user.save()
         user2 = Student(user=user,
                         full_name=self.cleaned_data['full_name'],
+                        email=self.cleaned_data['email'],
                         date_of_birth=self.cleaned_data['date_of_birth'],
                         phone_number=self.cleaned_data['phone_number'],
                         educational_institution=self.cleaned_data['educational_institution'],
