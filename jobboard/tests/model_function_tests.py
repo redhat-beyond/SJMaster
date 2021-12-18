@@ -112,3 +112,5 @@ def test_get_jobs_by_major():
     # tests function by two majors "Major.COMPUTER_SCIENCE" and "Major.LAW"
     assert jobs_by_computer_science_and_law_major_from_test_function == \
            jobs_by_computer_science_and_law_major_added_manually
+
+
