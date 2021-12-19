@@ -1,8 +1,14 @@
 import pytest
 from django.contrib.auth.models import User
 from django.db.models import QuerySet
+from pytest_django.asserts import assertTemplateUsed
+
 from recruiter.models import Company, Recruiter
 from recruiter.forms import RecuiterRegistrationForm
+from jobboard.models import Job
+from job_application.models import Application
+from student.models import EducationalInstitution, Student
+from datetime import date
 
 
 @pytest.fixture()
@@ -22,26 +28,54 @@ def example_recruiter(example_user):
 
 
 @pytest.fixture
+def example_institution():
+    test_institution = EducationalInstitution(name="test_institution")
+    test_institution.save()
+    return test_institution
+
+
+@pytest.fixture
+def example_student(example_institution):
+    test_user = User.objects.create_user("test", "testpassword")
+    test_user.save()
+    test_student = Student(user=test_user, full_name="test user", email="test_user@test.com",
+                           date_of_birth=date(2020, 7, 13),
+                           phone_number="0000000000", educational_institution=example_institution,
+                           graduation_date=date(2020, 7, 13))
+    test_student.save()
+    return test_student
+
+
+@pytest.fixture
+def example_job_application(example_student):
+    job_a = Job.objects.get(title="job_a")
+    application_a = Application(
+        job=job_a, student=example_student, date_applied=date(2021, 7, 15))
+    application_a.save()
+    return application_a
+
+
+@pytest.fixture
 def invalid_recruiters_data():
     # username can't be none
     users_data = [
         {'username': "", 'email': "yarin@example.com",
          'password1': "Y123456789", 'password2': "Y123456789",
-                      'name': "yarin bouzaglo",
-                      'company':  Company.objects.get(name="example_company_a"),
-                      "phone_number": "0524434795"},
+         'name': "yarin bouzaglo",
+         'company': Company.objects.get(name="example_company_a"),
+         "phone_number": "0524434795"},
         # invalid email
         {'username': "", 'email': "yarin",
          'password1': "Y123456789", 'password2': "Y123456789",
-                      'name': "yarin bouzaglo",
-                      'company':  Company.objects.get(name="example_company_a"),
-                      "phone_number": "0524434795"},
+         'name': "yarin bouzaglo",
+         'company': Company.objects.get(name="example_company_a"),
+         "phone_number": "0524434795"},
         # passwords don't match
         {'username': "", 'email': "yarin@example.com",
          'password1': "Y123456789", 'password2': "Y1234",
-                      'name': "yarin bouzaglo",
-                      'company':  Company.objects.get(name="example_company_a"),
-                      "phone_number": "0524434795"}, ]
+         'name': "yarin bouzaglo",
+         'company': Company.objects.get(name="example_company_a"),
+         "phone_number": "0524434795"}, ]
     return users_data
 
 
@@ -50,7 +84,7 @@ def valid_recruiter_data():
     recruiter_data = {'username': "yarinTest1", 'email': "yarin@example.com",
                       'password1': "Y123456789", 'password2': "Y123456789",
                       'name': "yarin",
-                      'company':  Company.objects.get(name="example_company_a").id,
+                      'company': Company.objects.get(name="example_company_a").id,
                       "phone_number": "0524434795"}
     return recruiter_data
 
@@ -147,3 +181,30 @@ def test_new_recruiter_account_with_valid_data(valid_recruiter_data, client):
     assert example_recruiter_from_db.email == valid_recruiter_data["email"]
     assert example_recruiter_from_db.name == valid_recruiter_data["name"]
     assert example_recruiter_from_db.phone_number == valid_recruiter_data["phone_number"]
+
+
+@pytest.mark.django_db
+def test_recruiter_my_jobs_loads_correct_data(example_recruiter, example_job_application, client):
+    recruiter_object = Recruiter.objects.get(name="a")
+    client.force_login(recruiter_object.user)
+    response = client.get("/myjobs")
+    assert response.status_code == 200
+    assertTemplateUsed(response, 'recruiter_my_jobs_and_applications.html')
+    jobs_and_applications_from_response = response.context["jobs_and_applications"]
+    assert list(jobs_and_applications_from_response.keys()) == list(Job.get_jobs_by_recruiter_id(recruiter_object))
+    assert all(
+        list(jobs_and_applications_from_response[job]) == list(Application.get_applications_by_job(job)) for job in
+        jobs_and_applications_from_response)
+
+
+@pytest.mark.django_db
+def test_student_user_cannot_access_my_jobs_page(example_student, client):
+    client.force_login(example_student.user)
+    response = client.get("/myjobs")
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_user_not_student_or_recruiter_cannot_access_my_jobs_page(client):
+    response = client.get("/myjobs")
+    assert response.status_code == 404

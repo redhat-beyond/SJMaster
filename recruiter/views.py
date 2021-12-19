@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .forms import RecuiterRegistrationForm
 from django.contrib.auth.mixins import UserPassesTestMixin
@@ -15,10 +15,7 @@ def job_created_successfully(request):
 
 def recruiter_view_my_jobs_and_applications(request):
     context = {}
-    try:
-        recruiter_object = Recruiter.objects.get(user_id=request.user.id)
-    except Recruiter.DoesNotExist:
-        return render(request, "dead_end.html")
+    recruiter_object = get_object_or_404(Recruiter, user_id=request.user.id)
     recruiter_jobs = Job.get_jobs_by_recruiter_id(recruiter_object)
     job_applications_dictionary = {}
     for job in recruiter_jobs:
