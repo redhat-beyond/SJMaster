@@ -268,6 +268,7 @@ def test_new_student_account_with_valid_data(valid_student_data, client):
     user = User.objects.get(username=valid_student_data["username"])
     example_student_from_db = Student.objects.get(user_id=user.id)
     assert example_student_from_db.full_name == valid_student_data["full_name"]
+    assert example_student_from_db.email == valid_student_data["email"]
     assert example_student_from_db.date_of_birth == valid_student_data["date_of_birth"]
     assert example_student_from_db.phone_number == valid_student_data["phone_number"]
     assert example_student_from_db.about == valid_student_data["about"]
