@@ -1,4 +1,5 @@
 from django.shortcuts import render
+
 from .models import Job
 from datetime import date, timedelta
 from student.models import Student
@@ -44,4 +45,20 @@ def board(request):
         content = get_content_if_user_is_student(request)
     else:
         content = get_content_if_user_is_not_student(request, user_is_recruiter)
+    add_navbar_links_to_context(request, content)
     return render(request, 'jobboard/board.html', content)
+
+
+def add_navbar_links_to_context(request, context):
+    if Student.is_student(request.user.id):
+        context['navbar_links'] = {"Account Settings": "/student/account_settings/", "Logout": "/logout",
+                                   f"Welcome {request.user.username}": "#"}
+
+    elif Recruiter.is_recruiter(request.user.id):
+        context['navbar_links'] = {"Account Settings": "/recruiter/account_settings/", "My Jobs": "/myjobs",
+                                   "Create Job": "/recruiter/create_new_job_form", "Logout": "/logout",
+                                   f"Welcome {request.user.username}": "#"}
+    elif request.user.is_authenticated:
+        context['navbar_links'] = {"Logout": "/logout"}
+    else:
+        context['navbar_links'] = {"Login": "/login"}

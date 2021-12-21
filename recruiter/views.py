@@ -7,6 +7,7 @@ from jobboard.models import Job
 from recruiter.models import Recruiter
 from job_application.models import Application
 from datetime import date
+import jobboard.views
 
 
 def job_created_successfully(request):
@@ -25,6 +26,7 @@ def recruiter_view_my_jobs_and_applications(request):
         job_applications_dictionary[job] = list(
             Application.get_applications_by_job(job))
     context["jobs_and_applications"] = job_applications_dictionary
+    jobboard.views.add_navbar_links_to_context(request, context)
     return render(request, "recruiter_my_jobs_and_applications.html", context)
 
 
