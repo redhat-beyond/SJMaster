@@ -70,8 +70,11 @@ def recruiterRegister(request):
         form = RecuiterRegistrationForm()
 
     context = {'form': form}
+    jobboard.views.add_navbar_links_to_context(request, context)
     return render(request, 'recruiter/registerRecruiter.html', context)
 
 
 def recruiter_created_successfully(request):
-    return render(request, 'recruiter/recruiter_created_successfully.html')
+    context = {}
+    jobboard.views.add_navbar_links_to_context(request, context)
+    return render(request, 'recruiter/recruiter_created_successfully.html', context)

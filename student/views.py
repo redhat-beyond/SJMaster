@@ -41,8 +41,11 @@ def studentRegister(request):
         form = StudentRegistrationForm()
 
     context = {'form': form}
+    jobboard.views.add_navbar_links_to_context(request, context)
     return render(request, 'student/registerStudent.html', context)
 
 
 def student_created_successfully(request):
-    return render(request, 'student/student_created_successfully.html')
+    context = {}
+    jobboard.views.add_navbar_links_to_context(request, context)
+    return render(request, 'student/student_created_successfully.html', context)
