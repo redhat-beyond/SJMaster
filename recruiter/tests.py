@@ -60,6 +60,17 @@ def test_get_all_companies_returns_all_companies_as_a_query_set():
     companies_set = Company.get_all_companies()
     assert isinstance(companies_set, QuerySet)
     assert all(isinstance(company, Company) for company in companies_set)
+    assert list(companies_set.values_list("name", "description", "website_url")) == [
+        ("Check Point Software Technologies, Ltd.",
+         "This is Check Point Software Technologies, Ltd.",
+         "Check_Point_Software_Technologies.com"),
+        ("Kaplan Open Source", "This is Kaplan Open Source", "KaplanOpenSource.com"),
+        ("Ping Identity", "This is Ping Identity", "PingIdentity.com"),
+        ("Seeking Alpha", "This is Seeking Alpha", "SeekingAlpha.com"),
+        ("Synamedia", "This is Synamedia", "Synamedia.com"),
+        ("Toptal", "This is Toptal", "Toptal.com"),
+        ("example_company_a", "This is company a", "company_a.com"),
+        ("example_company_b", "This is company b", "company_b.com")]
 
 
 @pytest.mark.django_db
