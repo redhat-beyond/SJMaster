@@ -7,5 +7,4 @@ urlpatterns = [
     path('', include("recruiter.urls"), name="recruiter_urls"),
     path('', include("login.urls"), name="login_urls"),
     path('', include("jobboard.urls"), name="jobboard_urls"),
-
 ]

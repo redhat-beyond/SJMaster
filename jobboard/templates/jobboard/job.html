@@ -10,21 +10,11 @@
             <br> <br>
             <h6><strong>{{ job_data.description }}</strong></h6>
             <br>
-            {% if user.is_authenticated %}
-                {% if is_student %}
-                    {% if is_student_applied %}
-                        <p>YOU HAVE ALREADY APPLIED FOR THIS JOB</p>
-                    {% else %}
-                        <button onclick="location.href = 'apply_for_job/'" type="submit">APPLY NOW</button>
-                    {% endif %}
-                {% endif %}
-
-<!--                {% if is_recruiter %}-->
-<!--                    {% if job_data.recruiter.user.id == user.id %}-->
-<!--                        <button onclick="location.href = 'edit_job/{{ job.id }}/'" type="submit">Edit this job</button>-->
-<!--                    {% endif %}-->
-<!--                {% endif %}-->
+<!--            Adds additional data according to the user's type-->
+            {% if not user_indicator_template is None %}
+                {% include user_indicator_template %}
             {% endif %}
+            <br>
             <a href="/">Go back to all jobs</a>
         </div>
     </div>

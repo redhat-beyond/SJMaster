@@ -1,5 +1,4 @@
 from django.shortcuts import render, get_object_or_404, redirect
-
 import jobboard
 from .forms import CreateNewJobForm
 from .models import Job
@@ -92,16 +91,24 @@ def job_detail_view(request, id):
     context = dict()
     try:
         context["job_data"] = Job.objects.get(id=id)
-        # add edit page for recruiter - context["recruiter_job_owner"] =...
     except Job.DoesNotExist:
         return render(request, "jobboard/no_such_job.html")
 
-    context["is_student"] = Student.is_student(request.user.id)
-    context["is_recruiter"] = Recruiter.is_recruiter(request.user.id)
+    # setting a null default value if the user isn't recruiter or student
+    user_indicator_template = None
 
-    if context["is_student"]:
-        context["is_student_applied"] = check_if_student_already_applied(Student.get_student(request.user),
-                                                                         context["job_data"])
+    if Student.is_student(request.user.id):
+        if check_if_student_already_applied(Student.get_student(request.user), context["job_data"]):
+            user_indicator_template = "jobboard/student_user_applied_indicator.html"
+        else:
+            user_indicator_template = "jobboard/student_user_not_applied_indicator.html"
+
+    elif Recruiter.is_recruiter(request.user.id):
+        if context["job_data"].recruiter.user.id == request.user.id:
+            user_indicator_template = "jobboard/recruiter_user_owns_job_indicator.html"
+
+    context["user_indicator_template"] = user_indicator_template
+    add_navbar_links_to_context(request, context)
     return render(request, "jobboard/job.html", context)
 
 

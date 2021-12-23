@@ -6,10 +6,6 @@ from .models import Application
 from student.models import Student
 
 
-def apply_success(request):
-    return render(request, 'apply_success.html')
-
-
 def add_student_to_job_application(request, id):
     student_object = get_object_or_404(Student, user_id=request.user.id)
     job = Job.objects.get(id=id)
