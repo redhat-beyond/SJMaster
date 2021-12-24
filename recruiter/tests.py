@@ -17,6 +17,13 @@ def example_user():
     return user
 
 
+@pytest.fixture()
+def valid_company_data():
+    comapny = {"name": "Aspie", "description": "another company",
+               "website_url": "aspie.com"}
+    return comapny
+
+
 @pytest.fixture
 def example_recruiter(example_user):
     recruiter = Recruiter(user=example_user, name="test_recruiter",
@@ -213,7 +220,8 @@ def test_recruiter_my_jobs_loads_correct_data(client):
     assert response.status_code == 200
     assertTemplateUsed(response, 'recruiter_my_jobs_and_applications.html')
     jobs_and_applications_from_response = response.context["jobs_and_applications"]
-    assert list(jobs_and_applications_from_response.keys()) == list(Job.get_jobs_by_recruiter_id(recruiter_object))
+    assert list(jobs_and_applications_from_response.keys()) == list(
+        Job.get_jobs_by_recruiter_id(recruiter_object))
     assert all(
         list(jobs_and_applications_from_response[job]) == list(Application.get_applications_by_job(job)) for job in
         jobs_and_applications_from_response)
@@ -289,3 +297,14 @@ def test_update_recruiter_account_settings_with_valid_data(example_recruiter, ex
     assert example_recruiter_from_db.phone_number == new_phone_number
     # Test that untouched data hasn't changed
     assert example_recruiter_from_db.company == example_recruiter.company
+
+
+@pytest.mark.django_db
+def test_add_new_comapny(valid_company_data, client):
+    response = client.post("/companyRegister/", data=valid_company_data)
+    assert response.status_code == 302
+    company = Company.objects.get(name=valid_company_data["name"])
+    # Test that the new data was updated in the DB
+    assert company.name == valid_company_data["name"]
+    assert company.description == valid_company_data["description"]
+    assert company.website_url == valid_company_data["website_url"]

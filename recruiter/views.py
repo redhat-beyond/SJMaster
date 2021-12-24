@@ -1,11 +1,12 @@
 from django.contrib import messages
-from .forms import RecuiterRegistrationForm
-from django.shortcuts import render, redirect, get_object_or_404
+from .forms import (RecuiterRegistrationForm,
+                    CompanyRegistrationForm,
+                    UpdateRecruiterAccountSettingsForm)
+from django.shortcuts import render, get_object_or_404, redirect
 from jobboard.models import Job
 from recruiter.models import Recruiter
 from job_application.models import Application
 import jobboard.views
-from .forms import UpdateRecruiterAccountSettingsForm
 
 
 def recruiter_view_my_jobs_and_applications(request):
@@ -57,6 +58,23 @@ def recruiterRegister(request):
     context = {'form': form}
     jobboard.views.add_navbar_links_to_context(request, context)
     return render(request, 'recruiter/registerRecruiter.html', context)
+
+
+def companyRegister(request):
+    if request.method == 'POST':
+        form = CompanyRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/company_created_successfully')
+    else:
+        form = CompanyRegistrationForm()
+
+    context = {'form': form}
+    return render(request, 'recruiter/registerCompany.html', context)
+
+
+def company_created_successfully(request):
+    return render(request, 'recruiter/company_created_successfully.html')
 
 
 def recruiter_created_successfully(request):
