@@ -61,6 +61,14 @@ def test_get_all_companies_returns_all_companies_as_a_query_set():
     assert isinstance(companies_set, QuerySet)
     assert all(isinstance(company, Company) for company in companies_set)
     assert list(companies_set.values_list("name", "description", "website_url")) == [
+        ("Check Point Software Technologies, Ltd.",
+         "This is Check Point Software Technologies, Ltd.",
+         "Check_Point_Software_Technologies.com"),
+        ("Kaplan Open Source", "This is Kaplan Open Source", "KaplanOpenSource.com"),
+        ("Ping Identity", "This is Ping Identity", "PingIdentity.com"),
+        ("Seeking Alpha", "This is Seeking Alpha", "SeekingAlpha.com"),
+        ("Synamedia", "This is Synamedia", "Synamedia.com"),
+        ("Toptal", "This is Toptal", "Toptal.com"),
         ("example_company_a", "This is company a", "company_a.com"),
         ("example_company_b", "This is company b", "company_b.com")]
 
@@ -134,7 +142,8 @@ def test_signup_form_for_recruiter_loads_correctly(valid_recruiter_data, client)
     form = response.context["form"]
     form_initial_data = response.context["form"].initial
     assert isinstance(form, RecuiterRegistrationForm)
-    assert all(form_initial_data[key] == valid_recruiter_data[key] for key in form_initial_data)
+    assert all(form_initial_data[key] == valid_recruiter_data[key]
+               for key in form_initial_data)
 
 
 @pytest.mark.django_db
