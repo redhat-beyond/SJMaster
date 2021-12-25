@@ -27,3 +27,9 @@ class RecuiterRegistrationForm(UserCreationForm):
                           phone_number=self.cleaned_data['phone_number'])
         user2.save()
         return user2
+
+
+class UpdateRecruiterAccountSettingsForm(forms.ModelForm):
+    class Meta:
+        model = Recruiter
+        fields = ["name", "company", "email", "phone_number"]
