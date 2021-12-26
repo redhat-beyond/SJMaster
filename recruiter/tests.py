@@ -283,6 +283,7 @@ def test_update_recruiter_account_settings_forms_loads_correctly(example_recruit
     assert isinstance(form, UpdateRecruiterAccountSettingsForm)
     assert all(form_initial_data[key] == example_recruiter_data_as_dictionary[key]
                for key in form_initial_data)
+    assert all('form-control' in form_field.field.widget.attrs['class'] for form_field in form.visible_fields())
 
 
 @pytest.mark.django_db
