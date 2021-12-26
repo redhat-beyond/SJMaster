@@ -1,0 +1,41 @@
+.form-div h1 {
+    font-size: 2.3rem;
+    color: #F7F7F7;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 700;
+    text-align: center;
+}
+
+.form-div label {
+    font-size: 1.2rem;
+    color: #F7F7F7;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 600;
+}
+
+.form-div option {
+    color: black;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 400;
+}
+
+.input-black-text {
+    color: black;
+    font-weight: 400;
+}
+
+.form-div {
+    margin: 10px auto;
+    padding: 20px 70px;
+    width: 60%;
+    background-color: #6166B3;
+    -webkit-border-radius: 10px;
+}
+
+.button-color {
+    background-color: #17D7A0;
+}
+
+.submit-div{
+    text-align: center;
+}
