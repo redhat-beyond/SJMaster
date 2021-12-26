@@ -1,9 +1,11 @@
 import pytest
 from pytest_django.asserts import assertTemplateUsed
+from jobboard.forms import CreateNewJobForm
 from jobboard.models import Job
 from datetime import date, timedelta
 from django.contrib.auth.models import User
 from recruiter.models import Recruiter
+
 
 # The tests use the data that is already in the db from the migration files
 
@@ -54,3 +56,43 @@ def test_page_display_to_user_that_is_recruiter(client):
     jobs_to_display = Job.get_jobs_posted_on_or_after_specific_date(date_six_months_ago)
     # test that jobs displayed are only jobs created 6 months ago
     assert response.context['jobs_to_display'] == jobs_to_display
+
+
+@pytest.mark.django_db
+def test_create_new_job_form_with_valid_data(client, example_recruiter, example_job_data_as_dictionary):
+    client.force_login(example_recruiter.user)
+    response = client.post("/recruiter/create_new_job_form/", data=example_job_data_as_dictionary)
+    assert response.status_code == 302
+    assert response.url == "/job_created_successfully/"
+    example_job_from_db = Job.objects.get(title=example_job_data_as_dictionary["title"])
+    assert example_job_from_db.title == example_job_data_as_dictionary['title']
+    assert example_job_from_db.major == example_job_data_as_dictionary['major']
+    assert example_job_from_db.job_type == example_job_data_as_dictionary['job_type']
+    assert example_job_from_db.work_from == example_job_data_as_dictionary['work_from']
+    assert example_job_from_db.description == example_job_data_as_dictionary['description']
+    assert example_job_from_db.city.id == example_job_data_as_dictionary['city']
+    assert example_job_from_db.address == example_job_data_as_dictionary['address']
+    assert [keyword.id for keyword in example_job_from_db.title_keywords.all()] == example_job_data_as_dictionary[
+        "title_keywords"]
+
+
+@pytest.mark.django_db
+def test_create_new_job_form_with_invalid_data(example_recruiter, example_job_data_as_dictionary,
+                                               client):
+    example_job_data_as_dictionary['title'] = ""  # invalid title
+    client.force_login(example_recruiter.user)
+    response = client.post("/recruiter/create_new_job_form/", data=example_job_data_as_dictionary)
+    assert response.status_code == 200
+    form = response.context["form"]
+    assert form.is_valid() is False
+
+
+@pytest.mark.django_db
+def test_create_new_job_form_is_empty_when_initialized(client, example_recruiter):
+    client.force_login(example_recruiter.user)
+    response = client.post("/recruiter/create_new_job_form/")
+    assert response.status_code == 200
+    form = response.context["form"]
+    assert isinstance(form, CreateNewJobForm)
+    form_initial_data = response.context["form"].initial
+    assert form_initial_data == {}
