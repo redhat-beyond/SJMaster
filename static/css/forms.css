@@ -40,7 +40,6 @@
 .submit-div{
     text-align: center;
 }
-
 .success_class {
     text-align: center;
     color: white;
@@ -78,4 +77,24 @@
 .link_to_register:hover {
     color:black;
 }
+ .btn_color {
+     background-color: #17D7A0;
+     font-family: 'Raleway', sans-serif;
+     text-align: center;
+     border-color: #17D7A0;
+     color: #6166B3;
+     font-weight : bold;
+ }
+
+.login_link , .login_button{
+    color:#F7F7F7;
+    font-family: 'Raleway', sans-serif;
+    font-weight: bold;
+    font-size: 20px;
+}
+.btn_color:hover{
+    background-color: white;
+    color:#6166B3;
+}
+
 
