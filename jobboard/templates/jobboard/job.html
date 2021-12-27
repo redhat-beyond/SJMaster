@@ -1,0 +1,22 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md p-5 text-align">
+            <h2>{{ job_data.title }} </h2>
+            <h6> Company: {{ job_data.company }}, in {{ job_data.city }}</h6>
+            <h7>{{ job_data.job_type }} job ;</h7>
+            <h7> Work from: {{ job_data.work_from }}</h7>
+            <br> <br>
+            <h6><strong>{{ job_data.description }}</strong></h6>
+            <br>
+<!--            Adds additional data according to the user's type-->
+            {% if not user_indicator_template is None %}
+                {% include user_indicator_template %}
+            {% endif %}
+            <br>
+            <a href="/">Go back to all jobs</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

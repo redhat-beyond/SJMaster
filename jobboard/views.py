@@ -1,11 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
-
 import jobboard
 from .forms import CreateNewJobForm
 from .models import Job
 from datetime import date, timedelta
 from student.models import Student
 from recruiter.models import Recruiter
+from job_application.models import Application
 
 
 def get_content_if_user_is_student(request):
@@ -85,3 +85,34 @@ def create_new_job_form(request):
 
 def job_created_successfully(request):
     return render(request, 'job_created_successfully.html')
+
+
+def job_detail_view(request, id):
+    context = dict()
+    try:
+        context["job_data"] = Job.objects.get(id=id)
+    except Job.DoesNotExist:
+        return render(request, "jobboard/no_such_job.html")
+
+    # setting a null default value if the user isn't recruiter or student
+    user_indicator_template = None
+
+    if Student.is_student(request.user.id):
+        if check_if_student_already_applied(Student.get_student(request.user), context["job_data"]):
+            user_indicator_template = "jobboard/student_user_applied_indicator.html"
+        else:
+            user_indicator_template = "jobboard/student_user_not_applied_indicator.html"
+
+    elif Recruiter.is_recruiter(request.user.id):
+        if context["job_data"].recruiter.user.id == request.user.id:
+            user_indicator_template = "jobboard/recruiter_user_owns_job_indicator.html"
+
+    context["user_indicator_template"] = user_indicator_template
+    add_navbar_links_to_context(request, context)
+    return render(request, "jobboard/job.html", context)
+
+
+def check_if_student_already_applied(student, job):
+    applications_for_current_job = set(Application.get_applications_by_job(job))
+    applications_for_current_student = set(Application.get_applications_by_student(student))
+    return len(applications_for_current_job.intersection(applications_for_current_student)) > 0
