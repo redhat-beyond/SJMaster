@@ -30,6 +30,7 @@
     width: 60%;
     background-color: #6166B3;
     -webkit-border-radius: 10px;
+    text-align:center;
 }
 
 .button-color {
@@ -39,6 +40,7 @@
 .submit-div{
     text-align: center;
 }
+
 .success_class {
     text-align: center;
     color: white;
@@ -57,3 +59,23 @@
 .success_class-link:hover {
     color: black;
 }
+.login_btn {
+    background-color: #17D7A0;
+    margin-top: 2.5rem;
+    font-family: 'Raleway', sans-serif;
+    font-weight: bold;
+}
+.login_btn:hover {
+    background-color: white;
+    color: #6166B3;
+}
+.no_account {
+      color: #F7F7F7;
+      font-family: 'Raleway', sans-serif;
+      font-weight: 400;
+       font-size : 20px;
+}
+.link_to_register:hover {
+    color:black;
+}
+
