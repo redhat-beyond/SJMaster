@@ -12,9 +12,13 @@ def test_get_jobs_by_company_name():
     job_c = Job.objects.get(title="job_c")
     job_e = Job.objects.get(title="job_e")
     jobs_by_company_a_name_added_manually = {job_a, job_c, job_e}
-    jobs_by_company_a_name_from_test_function = Job.get_jobs_by_company_name("example_company_a")
+    jobs_by_company_a_name_from_test_function = Job.get_jobs_by_company_name("Example_Company_A")
+    jobs_by_company_name_that_does_not_exist_from_function = Job.get_jobs_by_company_name("blah")
     assert isinstance(jobs_by_company_a_name_from_test_function, set)
+    # tests function with company name "Example_Company_A"
     assert jobs_by_company_a_name_from_test_function == jobs_by_company_a_name_added_manually
+    # tests that function with company name that does not exist returns empty set
+    assert jobs_by_company_name_that_does_not_exist_from_function == set()
 
 
 @pytest.mark.django_db
@@ -33,8 +37,12 @@ def test_get_jobs_by_city_name():
     job_e = Job.objects.get(title="job_e")
     jobs_by_city_name_added_manually = {job_b, job_e}
     jobs_by_city_name_from_test_function = Job.get_jobs_by_city_name("Beersheba")
+    jobs_by_city_name_that_does_not_exist_from_function = Job.get_jobs_by_city_name("blah")
     assert isinstance(jobs_by_city_name_from_test_function, set)
+    # tests function with city name "Beersheba"
     assert jobs_by_city_name_from_test_function == jobs_by_city_name_added_manually
+    # tests that function with city name that does not exist returns empty set
+    assert jobs_by_city_name_that_does_not_exist_from_function == set()
 
 
 @pytest.mark.django_db
@@ -60,20 +68,23 @@ def test_get_jobs_by_type():
 
 
 @pytest.mark.django_db
-def test_get_jobs_by_keywords():
+def test_get_jobs_by_keyword():
     job_a = Job.objects.get(title="job_a")
     job_b = Job.objects.get(title="job_b")
     job_c = Job.objects.get(title="job_c")
     job_d = Job.objects.get(title="job_d")
     job_e = Job.objects.get(title="job_e")
     jobs_by_keyword_product_added_manually = {job_c, job_d}
-    jobs_by_keyword_product_from_function = Job.get_jobs_by_keywords("product")
-    jobs_by_keywords_software_and_engineer_added_manually = {job_a, job_b, job_e}
-    jobs_by_keywords_software_and_engineer_from_function = Job.get_jobs_by_keywords("software", "engineer")
-    # tests function with single keyword "product"
+    jobs_by_keyword_product_from_function = Job.get_jobs_by_keyword("product")
+    jobs_by_keyword_software_added_manually = {job_a, job_b, job_e}
+    jobs_by_keyword_software_from_function = Job.get_jobs_by_keyword("Software")
+    jobs_by_keyword_that_does_not_exist_from_function = Job.get_jobs_by_keyword("blah")
+    # tests function with keyword "product"
     assert jobs_by_keyword_product_from_function == jobs_by_keyword_product_added_manually
-    # tests function with 2 keywords "software" and "engineer"
-    assert jobs_by_keywords_software_and_engineer_from_function == jobs_by_keywords_software_and_engineer_added_manually
+    # tests function with keyword "Software"
+    assert jobs_by_keyword_software_from_function == jobs_by_keyword_software_added_manually
+    # tests that function with keyword that does not exist returns empty set
+    assert jobs_by_keyword_that_does_not_exist_from_function == set()
 
 
 @pytest.mark.django_db

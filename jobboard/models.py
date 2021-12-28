@@ -51,7 +51,7 @@ class Job(models.Model):
         """
         Allows students to search for a job based on the city it is located in
         """
-        return set(cls.objects.filter(city=City.objects.get(name=city_name)))
+        return set(cls.objects.filter(city__name__iexact=city_name))
 
     @classmethod
     def get_jobs_by_region_name(cls, region_name):
@@ -72,16 +72,11 @@ class Job(models.Model):
         return set(cls.objects.filter(job_type=job_type))
 
     @classmethod
-    def get_jobs_by_keywords(cls, *keywords_as_string):
+    def get_jobs_by_keyword(cls, keyword_as_string):
         """
-        Allows students to search for a job based on one ore more keywords linked to the job
+        Allows students to search for a job based on a keyword linked to the job
         """
-        jobs_to_return = set()
-        for keyword in keywords_as_string:
-            keyword_object = JobTitleKeyword.objects.get(keyword=keyword)
-            jobs_to_return.update(
-                set(cls.objects.filter(title_keywords=keyword_object)))
-        return jobs_to_return
+        return set(cls.objects.filter(title_keywords__keyword__iexact=keyword_as_string))
 
     @classmethod
     def get_jobs_posted_on_or_after_specific_date(cls, date):
@@ -102,7 +97,7 @@ class Job(models.Model):
         """
         Allows students to search for a job based on the company
         """
-        return set(cls.objects.filter(company=Company.objects.get(name=company_name)))
+        return set(cls.objects.filter(company__name__iexact=company_name))
 
     @classmethod
     def get_jobs_by_recruiter_id(cls, recruiter: Recruiter):
