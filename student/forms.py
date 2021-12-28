@@ -9,6 +9,16 @@ class UpdateStudentAccountSettingsForm(forms.ModelForm):
         model = Student
         fields = ["full_name", "email", "date_of_birth", "phone_number", "educational_institution",
                   "major", "about", "graduation_date"]
+        widgets = {
+            'full_name': forms.TextInput(attrs={'class': 'form-control input-black-text'}),
+            'email': forms.TextInput(attrs={'class': 'form-control input-black-text'}),
+            'date_of_birth': forms.TextInput(attrs={'class': 'form-control input-black-text'}),
+            'phone_number': forms.TextInput(attrs={'class': 'form-control input-black-text'}),
+            'educational_institution': forms.Select(attrs={'class': 'form-control input-black-text'}),
+            'major': forms.Select(attrs={'class': 'form-control input-black-text'}),
+            'about': forms.Textarea(attrs={'class': 'form-control input-black-text', 'rows': '5'}),
+            'graduation_date': forms.TextInput(attrs={'class': 'form-control input-black-text'}),
+        }
 
 
 class StudentRegistrationForm(UserCreationForm):

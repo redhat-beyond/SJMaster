@@ -1,11 +1,15 @@
 {% extends 'base.html' %}
 {% block content %}
-    <h1>Edit Account Details</h1>
-    <p>
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Update">
-    </form>
-    </p>
+    <div class="justify-content-center form-div shadow">
+        <h1>Edit Account Details</h1>
+        <p>
+        <form method="POST">
+            {% csrf_token %}
+            <strong>{{ form.as_p }}</strong>
+            <div class="submit-div">
+                <input class="btn button-color" type="submit" value="Update">
+            </div>
+        </form>
+        </p>
+    </div>
 {% endblock %}
