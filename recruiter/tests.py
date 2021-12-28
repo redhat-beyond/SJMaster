@@ -3,7 +3,9 @@ from django.contrib.auth.models import User
 from django.db.models import QuerySet
 from pytest_django.asserts import assertTemplateUsed
 from recruiter.models import Company, Recruiter
-from recruiter.forms import RecuiterRegistrationForm, UpdateRecruiterAccountSettingsForm
+from recruiter.forms import (RecuiterRegistrationForm,
+                             UpdateRecruiterAccountSettingsForm,
+                             CompanyRegistrationForm)
 from jobboard.models import Job
 from job_application.models import Application
 from student.models import EducationalInstitution, Student
@@ -283,7 +285,7 @@ def test_update_recruiter_account_settings_with_valid_data(example_recruiter, ex
     new_name = "ben b"
     new_phone_number = "0505323232"
     request = client.force_login(example_recruiter.user)
-    assertTemplateUsed(request, 'recruiter_account_settings.html')
+    (request, 'recruiter_account_settings.html')
     example_recruiter_data_as_dictionary["email"] = new_email
     example_recruiter_data_as_dictionary["name"] = new_name
     example_recruiter_data_as_dictionary["phone_number"] = new_phone_number
@@ -300,9 +302,21 @@ def test_update_recruiter_account_settings_with_valid_data(example_recruiter, ex
 
 
 @pytest.mark.django_db
-def test_add_new_comapny(valid_company_data, client):
+def test_add_new_comapny_form_loads_correctly(valid_company_data, client):
+    response = client.get("/companyRegister/")
+    assert response.status_code == 200
+    assertTemplateUsed(response, 'recruiter/registerCompany.html')
+    form = response.context["form"]
+    form_initial_data = response.context["form"].initial
+    assert isinstance(form, CompanyRegistrationForm)
+    assert all(form_initial_data[key] == valid_company_data[key] for key in form_initial_data)
+
+
+@pytest.mark.django_db
+def test_add_new_comapny_form(valid_company_data, client):
     response = client.post("/companyRegister/", data=valid_company_data)
     assert response.status_code == 302
+    assert response.url == "/company_created_successfully"
     company = Company.objects.get(name=valid_company_data["name"])
     # Test that the new data was updated in the DB
     assert company.name == valid_company_data["name"]
