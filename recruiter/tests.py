@@ -94,9 +94,22 @@ def test_get_all_companies_returns_all_companies_as_a_query_set():
     companies_set = Company.get_all_companies()
     assert isinstance(companies_set, QuerySet)
     assert all(isinstance(company, Company) for company in companies_set)
-    assert list(companies_set.values_list("name", "description", "website_url")) == [
-        ("Check Point Software Technologies, Ltd.",
-         "This is Check Point Software Technologies, Ltd.",
+    assert set(companies_set.values_list("name", "description", "website_url")) == {
+        ("Iron Source", "This is Iron Source", "https://www.is.com"),
+        ("Apple", "This is Apple", "https://www.apple.com"),
+        ("Microsoft", "This is Microsoft", "https://www.microsoft.com/en-il/"),
+        ("Palo Alto", "This is Palo Alto", "https://www.paloaltonetworks.com"),
+        ("Red Hat", "This is Red Hat", "https://www.redhat.com/en"),
+        ("Meta", "This is Meta", "https://about.facebook.com/meta/"),
+        ("Mobileye", "This is Mobileye", "https://www.mobileye.com/he-il/"),
+        ("Intel", "This is Intel", "https://www.intel.co.il/content/www/il/he/homepage.html"),
+        ("Elbit", "This is Elbit", "https://elbitsystems.com"), ("Fiverr", "This is Fiverr", "https://www.fiverr.com"),
+        ("Amazon", "This is Amazon", "https://www.amazon.com"), ("Google", "This is Google", "https://www.google.com"),
+        ("Monday", "This is Monday", "https://monday.com"), ("Wix", "This is Wix", "https://www.wix.com"),
+        ("Similarweb", "This is Similarweb", "https://www.similarweb.com"),
+        ("Paypal", "This is Paypal", "https://www.paypal.com/il/home"),
+        ("Apps Flyer", "This is Apps Flyer", "https://www.appsflyer.com"),
+        ("Check Point Software Technologies, Ltd.", "This is Check Point Software Technologies, Ltd.",
          "Check_Point_Software_Technologies.com"),
         ("Kaplan Open Source", "This is Kaplan Open Source", "KaplanOpenSource.com"),
         ("Ping Identity", "This is Ping Identity", "PingIdentity.com"),
@@ -104,7 +117,7 @@ def test_get_all_companies_returns_all_companies_as_a_query_set():
         ("Synamedia", "This is Synamedia", "Synamedia.com"),
         ("Toptal", "This is Toptal", "Toptal.com"),
         ("example_company_a", "This is company a", "company_a.com"),
-        ("example_company_b", "This is company b", "company_b.com")]
+        ("example_company_b", "This is company b", "company_b.com")}
 
 
 @pytest.mark.django_db
