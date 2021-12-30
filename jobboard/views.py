@@ -16,10 +16,12 @@ def get_content_if_user_is_student(request):
     user_as_student = Student.get_student(request.user.id)
     jobs_by_student_major = Job.get_jobs_by_major(user_as_student.major)
     content = {'jobs_to_display': jobs_by_student_major,
+               'jobs_intro_message': 'Here are some jobs that match your profile',
                'user': request.user,
                'user_is_student': True,
                'user_is_recruiter': False,
-               'user_as_student': user_as_student}
+               'user_as_student': user_as_student,
+               'user_name': f"{request.user.first_name} {request.user.last_name}"}
     return content
 
 
@@ -32,12 +34,25 @@ def get_content_if_user_is_not_student(request, user_is_recruiter):
     latest_jobs = Job.get_jobs_posted_on_or_after_specific_date(
         date_six_months_ago)
     content = {'jobs_to_display': latest_jobs,
+               'jobs_intro_message': 'Here are jobs created in the last 6 months',
                'user': request.user,
                'user_is_student': False,
                'user_is_recruiter': user_is_recruiter}
     if user_is_recruiter:
         content['user_as_recruiter'] = Recruiter.get_recruiter(request.user.id)
+        content['user_name'] = f"{request.user.first_name} {request.user.last_name}"
     return content
+
+
+def searched_by_company_or_keyword(searched_name):
+    jobs_by_company = Job.get_jobs_by_company_name(searched_name)
+    jobs_by_keyword = Job.get_jobs_by_keyword(searched_name)
+    return jobs_by_company.union(jobs_by_keyword)
+
+
+def searched_by_city(searched_city):
+    jobs_by_city = Job.get_jobs_by_city_name(searched_city)
+    return jobs_by_city
 
 
 def board(request):
@@ -47,6 +62,23 @@ def board(request):
         content = get_content_if_user_is_student(request)
     else:
         content = get_content_if_user_is_not_student(request, user_is_recruiter)
+
+    # user hit the search button
+    if request.method == "POST":
+        searched_name = request.POST.get('searched_name')
+        searched_city = request.POST.get('searched_city')
+        content["searched_name"] = searched_name
+        content["searched_city"] = searched_city
+        if searched_name and not searched_city:
+            content['jobs_to_display'] = searched_by_company_or_keyword(searched_name)
+            content['jobs_intro_message'] = f"Here are jobs for '{searched_name}'"
+        elif searched_city and not searched_name:
+            content['jobs_to_display'] = searched_by_city(searched_city)
+            content['jobs_intro_message'] = f"Here are jobs located at '{searched_city}"
+        else:
+            content['jobs_to_display'] = searched_by_city(searched_city).\
+                intersection(searched_by_company_or_keyword(searched_name))
+            content['jobs_intro_message'] = f"Here are jobs for '{searched_name}' located at '{searched_city}"
     add_navbar_links_to_context(request, content)
     return render(request, 'jobboard/board.html', content)
 
