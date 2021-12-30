@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
-{% block content %}
-    <h2>You have already applied for this job !<br> No need to try applying again</h2>
-        <a href="/">Go back to finding a job!</a>
+{% block content %} {% load static %}
+
+<div class="success_page_div shadow">
+    <h2 class="success_class">You have already applied for this job !<br> No need to try applying again<br>
+        <a class="back-alljobs-centered" href="/">Go back to finding a job!</a>
+        </h2>
+</div>
 {% endblock %}
