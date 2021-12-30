@@ -39,3 +39,21 @@
 .submit-div{
     text-align: center;
 }
+.success_class {
+    text-align: center;
+    color: white;
+    text: white;
+}
+.success_page_div {
+    background: #6166B3;
+    margin: 100px;
+    padding: 70px 70px;
+    font-family: 'Raleway', sans-serif;
+    -webkit-border-radius: 10px;
+}
+.success_class-link {
+    color: white;
+}
+.success_class-link:hover {
+    color: black;
+}
