@@ -26,6 +26,21 @@ def valid_company_data():
     return comapny
 
 
+@pytest.fixture()
+def invalid_companies_data():
+    # name can't be none
+    companies_data = [
+        {"name": "", "description": "another company",
+         "website_url": "aspie.com"},
+        # invalid description
+        {"name": "Aspie", "description": "",
+         "website_url": "aspie.com"},
+        # invalid website_url
+        {"name": "Aspie", "description": "another company",
+         "website_url": ""}, ]
+    return companies_data
+
+
 @pytest.fixture
 def example_recruiter(example_user):
     recruiter = Recruiter(user=example_user, name="test_recruiter",
@@ -111,10 +126,14 @@ def test_get_all_companies_returns_all_companies_as_a_query_set():
         ("Red Hat", "This is Red Hat", "https://www.redhat.com/en"),
         ("Meta", "This is Meta", "https://about.facebook.com/meta/"),
         ("Mobileye", "This is Mobileye", "https://www.mobileye.com/he-il/"),
-        ("Intel", "This is Intel", "https://www.intel.co.il/content/www/il/he/homepage.html"),
-        ("Elbit", "This is Elbit", "https://elbitsystems.com"), ("Fiverr", "This is Fiverr", "https://www.fiverr.com"),
-        ("Amazon", "This is Amazon", "https://www.amazon.com"), ("Google", "This is Google", "https://www.google.com"),
-        ("Monday", "This is Monday", "https://monday.com"), ("Wix", "This is Wix", "https://www.wix.com"),
+        ("Intel", "This is Intel",
+         "https://www.intel.co.il/content/www/il/he/homepage.html"),
+        ("Elbit", "This is Elbit", "https://elbitsystems.com"), ("Fiverr",
+                                                                 "This is Fiverr", "https://www.fiverr.com"),
+        ("Amazon", "This is Amazon", "https://www.amazon.com"), ("Google",
+                                                                 "This is Google", "https://www.google.com"),
+        ("Monday", "This is Monday", "https://monday.com"), ("Wix",
+                                                             "This is Wix", "https://www.wix.com"),
         ("Similarweb", "This is Similarweb", "https://www.similarweb.com"),
         ("Paypal", "This is Paypal", "https://www.paypal.com/il/home"),
         ("Apps Flyer", "This is Apps Flyer", "https://www.appsflyer.com"),
@@ -262,7 +281,8 @@ def test_update_recruiter_account_settings_forms_loads_correctly(example_recruit
     form = response.context["form"]
     form_initial_data = response.context["form"].initial
     assert isinstance(form, UpdateRecruiterAccountSettingsForm)
-    assert all(form_initial_data[key] == example_recruiter_data_as_dictionary[key] for key in form_initial_data)
+    assert all(form_initial_data[key] == example_recruiter_data_as_dictionary[key]
+               for key in form_initial_data)
 
 
 @pytest.mark.django_db
@@ -271,7 +291,8 @@ def test_update_recruiter_account_settings_with_invalid_data(example_recruiter, 
     invalid_email = "bbb"
     client.force_login(example_recruiter.user)
     example_recruiter_data_as_dictionary["email"] = invalid_email
-    response = client.post("/recruiter/account_settings/", data=example_recruiter_data_as_dictionary)
+    response = client.post("/recruiter/account_settings/",
+                           data=example_recruiter_data_as_dictionary)
     assert response.status_code == 200
     assertTemplateUsed(response, 'recruiter_account_settings.html')
     form = response.context["form"]
@@ -289,10 +310,12 @@ def test_update_recruiter_account_settings_with_valid_data(example_recruiter, ex
     example_recruiter_data_as_dictionary["email"] = new_email
     example_recruiter_data_as_dictionary["name"] = new_name
     example_recruiter_data_as_dictionary["phone_number"] = new_phone_number
-    response = client.post("/recruiter/account_settings/", data=example_recruiter_data_as_dictionary)
+    response = client.post("/recruiter/account_settings/",
+                           data=example_recruiter_data_as_dictionary)
     assert response.status_code == 302
     assert response.url == "/account_update_success/"
-    example_recruiter_from_db = Recruiter.objects.get(user_id=example_recruiter.user.id)
+    example_recruiter_from_db = Recruiter.objects.get(
+        user_id=example_recruiter.user.id)
     # Test that the new data was updated in the DB
     assert example_recruiter_from_db.email == new_email
     assert example_recruiter_from_db.name == new_name
@@ -309,11 +332,12 @@ def test_add_new_comapny_form_loads_correctly(valid_company_data, client):
     form = response.context["form"]
     form_initial_data = response.context["form"].initial
     assert isinstance(form, CompanyRegistrationForm)
-    assert all(form_initial_data[key] == valid_company_data[key] for key in form_initial_data)
+    assert all(form_initial_data[key] == valid_company_data[key]
+               for key in form_initial_data)
 
 
 @pytest.mark.django_db
-def test_add_new_comapny_form(valid_company_data, client):
+def test_add_new_comapny_form_with_valid_data(valid_company_data, client):
     response = client.post("/companyRegister/", data=valid_company_data)
     assert response.status_code == 302
     assert response.url == "/company_created_successfully"
@@ -322,3 +346,13 @@ def test_add_new_comapny_form(valid_company_data, client):
     assert company.name == valid_company_data["name"]
     assert company.description == valid_company_data["description"]
     assert company.website_url == valid_company_data["website_url"]
+
+
+@pytest.mark.django_db
+def test_add_new_comapny_form__with_invalid_data(invalid_companies_data, client):
+    for company_data in invalid_companies_data:
+        response = client.post("/companyRegister/", data=company_data)
+        assert response.status_code == 200
+        assertTemplateUsed(response, 'recruiter/registerCompany.html')
+        form = response.context["form"]
+        assert form.is_valid() is False

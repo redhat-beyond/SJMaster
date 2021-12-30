@@ -31,7 +31,8 @@ def update_recruiter_account_settings_view(request):
     context = {}
     jobboard.views.add_navbar_links_to_context(request, context)
     recruiter_object = get_object_or_404(Recruiter, user_id=request.user.id)
-    update_recruiter_form = UpdateRecruiterAccountSettingsForm(request.POST or None, instance=recruiter_object)
+    update_recruiter_form = UpdateRecruiterAccountSettingsForm(
+        request.POST or None, instance=recruiter_object)
     context["form"] = update_recruiter_form
     if request.method == 'GET':
         return render(request, "recruiter_account_settings.html", context)
