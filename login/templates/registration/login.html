@@ -1,18 +1,20 @@
 {% extends 'base.html' %} {% block content %} {% load crispy_forms_tags %}
 
 <!--Login-->
-<div class="container py-5">
-  <h1>Login</h1>
-  <form method="POST">
-    {% csrf_token %} {{ form|crispy }}
-    <button class="btn btn-primary" type="submit">Login</button>
-  </form>
-  <p class="text-center">
-    Don't have an account? Create an account
-    <a href="/registerStudent"> as a student</a> or<a href="/recruiterRegister">
-      as a Recruiter</a
-    >.
-  </p>
-</div>
+<div class="container py-5 form-div">
+    <h1 class="login_header">Login</h1>
+    <form class="form-div" method="POST">
+        {% csrf_token %} {{ form|crispy }}
+        <div class="submit-div">
+            <button class="btn btn-primary login_btn" type="submit">Login</button>
+        </div>
+    </form>
+    <p class="text-center no_account">
+        Don't have an account? Create an account
+        <a class="no_account link_to_register" href="/registerStudent"> as a student</a> or<a
+            class="no_account link_to_register" href="/recruiterRegister">
+        as a Recruiter</a>
+    </p>
+</div> 
 
 {% endblock %}
