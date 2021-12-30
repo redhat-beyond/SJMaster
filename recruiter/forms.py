@@ -33,3 +33,9 @@ class UpdateRecruiterAccountSettingsForm(forms.ModelForm):
     class Meta:
         model = Recruiter
         fields = ["name", "company", "email", "phone_number"]
+
+
+class CompanyRegistrationForm(forms.ModelForm):
+    class Meta:
+        model = Company
+        fields = ["name", "description", "website_url"]
