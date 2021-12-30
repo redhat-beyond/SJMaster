@@ -106,7 +106,7 @@ def test_job_display_to_user_that_is_not_student_and_not_recruiter(client):
 def test_try_displaying_non_exist_job_user_is_student(client, example_student_a):
     client.force_login(example_student_a.user)
     # job with id=8 does not exist
-    response = client.get("/job/8/")
+    response = client.get("/job/100/")
     assert response.status_code == 200
     assertTemplateUsed(response, 'jobboard/no_such_job.html')
 
@@ -116,7 +116,7 @@ def test_try_displaying_non_exist_job_user_is_recruiter(client):
     example_recruiter_a_from_db = Recruiter.objects.get(name='a')
     client.force_login(example_recruiter_a_from_db.user)
     # job with id=8 does not exist
-    response = client.get("/job/8/")
+    response = client.get("/job/100/")
     assert response.status_code == 200
     assertTemplateUsed(response, 'jobboard/no_such_job.html')
 
@@ -126,6 +126,6 @@ def test_try_displaying_non_exist_job_user_is_not_student_and_not_recruiter(clie
     example_user = User.objects.create_user("username", "password")
     client.force_login(example_user)
     # job with id=10 does not exist
-    response = client.get("/job/10/")
+    response = client.get("/job/100/")
     assert response.status_code == 200
     assertTemplateUsed(response, 'jobboard/no_such_job.html')
