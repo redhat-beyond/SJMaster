@@ -1,0 +1,67 @@
+.main-content {
+  margin-top: 40px;
+  padding-top: 40px;
+  border-top: 7px ridge #6166b3;
+}
+
+.user-box {
+  width: 300px;
+  position: fixed;
+  top: 40%;
+  border-style: ridge;
+  border-width: 5px;
+  border-color: #6166b3;
+  border-radius: 15px;
+  padding: 10px;
+  background-color: rgb(230, 230, 230);
+}
+
+.jobs-intro {
+  color: black;
+  font-size: 2.3rem;
+  font-family: "Raleway", sans-serif;
+  font-weight: 700;
+  font-style: italic;
+  text-align: center;
+}
+
+.user-info {
+  color: black;
+  font-family: "Raleway", sans-serif;
+  font-weight: 700;
+  text-align: center;
+}
+
+.form-control {
+  width: 400px;
+  border-style: ridge;
+  border-width: 2px;
+  border-color: #6166b3;
+}
+
+.list-group {
+  width: 400px;
+}
+
+.list-group-item {
+  background-color: rgb(230, 230, 230);
+  font-family: "Raleway", sans-serif;
+  font-size: large;
+  border-style: ridge;
+  border-width: 3px;
+  border-color: #6166b3;
+}
+
+.title {
+  font-weight: 700;
+  font-size: x-large;
+}
+
+.field {
+  font-weight: 500;
+}
+
+#read-more {
+  background-color: #17d7a0;
+  margin: auto;
+}
