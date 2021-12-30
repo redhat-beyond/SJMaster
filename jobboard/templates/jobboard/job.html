@@ -1,22 +1,24 @@
 {% extends 'base.html' %} {% block content %}
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md p-5 text-align">
-            <h2>{{ job_data.title }} </h2>
-            <h6> Company: {{ job_data.company }}, in {{ job_data.city }}</h6>
-            <h7>{{ job_data.job_type }} job ;</h7>
-            <h7> Work from: {{ job_data.work_from }}</h7>
-            <br> <br>
-            <h6><strong>{{ job_data.description }}</strong></h6>
-            <br>
-<!--            Adds additional data according to the user's type-->
-            {% if not user_indicator_template is None %}
-                {% include user_indicator_template %}
-            {% endif %}
-            <br>
-            <a href="/">Go back to all jobs</a>
+<div class="job-div justify-content-center">
+    <div class="job-body">
+        <h1 id="job-title">{{ job_data.title }} </h1>
+        <div class="container">
+            <ul>
+                <li> Company: <strong class="db-name">{{ job_data.company }}</strong></li>
+                <li> Job Location: <strong class="db-name">{{ job_data.city }}</strong></li>
+                <li> Work from: <strong class="db-name">{{ job_data.work_from }}</strong></li>
+                <li><strong class="db-name">{{ job_data.job_type }} job</strong> </li>
+            </ul>
         </div>
+        <div class="container">
+            <h6>Job Description: <strong class="db-name">{{ job_data.description }}</strong></h6>
+        </div>
+<!--            Adds additional data according to the user's type-->
+        {% if not user_indicator_template is None %}
+            {% include user_indicator_template %}
+        {% endif %}
+        <a class="aqua-colored" href="/">Go back to all jobs</a>
     </div>
 </div>
 {% endblock %}
