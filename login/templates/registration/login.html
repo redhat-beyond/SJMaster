@@ -3,9 +3,9 @@
 <!--Login-->
 <div class="container py-5 form-div">
     <h1 class="login_header">Login</h1>
+    <div class="submit-div">
     <form class="form-div" method="POST">
         {% csrf_token %} {{ form|crispy }}
-        <div class="submit-div">
             <button class="btn btn-primary login_btn" type="submit">Login</button>
         </div>
     </form>
