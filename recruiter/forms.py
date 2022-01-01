@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Recruiter, Company
+from jobboard.forms import FormControl
 
 
 class RecuiterRegistrationForm(UserCreationForm):
@@ -29,7 +30,7 @@ class RecuiterRegistrationForm(UserCreationForm):
         return user2
 
 
-class UpdateRecruiterAccountSettingsForm(forms.ModelForm):
+class UpdateRecruiterAccountSettingsForm(FormControl):
     class Meta:
         model = Recruiter
         fields = ["name", "company", "email", "phone_number"]
