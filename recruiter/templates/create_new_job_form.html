@@ -1,17 +1,15 @@
 {% extends 'base.html' %}
 {% block content %}
-<html>
-<title>Job Creation form</title>
-<h2>Create a new job:</h2>
-</html>
-<body>
-    <form method="POST">
-    {% csrf_token %}
-
-    <! -- form variable>
-    {{ form.as_p }}
-
-    <input type = "submit" name="Create">
-    </form>
-</body>
+    <div class="justify-content-center form-div shadow">
+        <h1>Create New Job</h1>
+        <p>
+        <form method="POST">
+            {% csrf_token %}
+            <strong>{{ form.as_p }}</strong>
+            <div class="submit-div">
+                <input class="btn button-color" type="submit" value="Update">
+            </div>
+        </form>
+        </p>
+    </div>
 {% endblock %}
